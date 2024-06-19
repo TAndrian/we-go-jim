@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- Create User table -->
+    <changeSet id="1" author="TAndrian">
+        <createTable tableName="user">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="first_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="email" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="password" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP"/>
+            <column name="updated_at" type="TIMESTAMP"/>
+        </createTable>
+    </changeSet>
+
+    <!-- Create Booking table -->
+    <changeSet id="2" author="TAndrian">
+        <createTable tableName="booking">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="start_time" type="TIMESTAMP"/>
+            <column name="end_time" type="TIMESTAMP"/>
+            <column name="max_participant" type="integer"/>
+            <column name="created_at" type="TIMESTAMP"/>
+            <column name="updated_at" type="TIMESTAMP"/>
+        </createTable>
+    </changeSet>
+
+    <!-- Create Many-To-Many relationship -->
+    <changeSet id="3" author="TAndrian">
+        <createTable tableName="users_bookings">
+            <column name="user_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="booking_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!-- Add foreign key constraint for user_id -->
+    <changeSet id="5" author="TAndrian">
+        <addForeignKeyConstraint baseTableName="users_bookings"
+                                 baseColumnNames="user_id"
+                                 constraintName="fk_users_bookings_users"
+                                 referencedTableName="user"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+    <!-- Add foreign key constraint for booking_id -->
+    <changeSet id="6" author="TAndrian">
+        <addForeignKeyConstraint baseTableName="users_bookings"
+                                 baseColumnNames="booking_id"
+                                 constraintName="fk_users_bookings_bookings"
+                                 referencedTableName="booking"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+</databaseChangeLog>

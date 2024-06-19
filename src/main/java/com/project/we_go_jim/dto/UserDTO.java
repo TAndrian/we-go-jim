@@ -7,6 +7,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Set;
+import java.util.UUID;
+
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -14,4 +17,9 @@ import lombok.Setter;
 @Setter
 @EqualsAndHashCode(callSuper = false)
 public class UserDTO {
+    private UUID id;
+    private String firstName;
+    private String lastName;
+    private String email;
+    private Set<BookingDTO> bookings;
 }
