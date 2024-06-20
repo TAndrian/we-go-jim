@@ -28,7 +28,7 @@ import java.util.UUID;
 @Builder
 @Getter
 @Setter
-@Table(name = "user")
+@Table(name = "users")
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserEntity extends TemporalBaseUtil {

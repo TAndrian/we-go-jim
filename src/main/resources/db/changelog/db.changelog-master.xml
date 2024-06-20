@@ -6,7 +6,7 @@
 
     <!-- Create User table -->
     <changeSet id="1" author="TAndrian">
-        <createTable tableName="user">
+        <createTable tableName="users">
             <column name="id" type="uuid">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
@@ -58,7 +58,7 @@
         <addForeignKeyConstraint baseTableName="users_bookings"
                                  baseColumnNames="user_id"
                                  constraintName="fk_users_bookings_users"
-                                 referencedTableName="user"
+                                 referencedTableName="users"
                                  referencedColumnNames="id"
                                  onDelete="CASCADE"/>
     </changeSet>
