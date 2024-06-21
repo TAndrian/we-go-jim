@@ -23,6 +23,7 @@ import java.util.UUID;
 import static com.project.we_go_jim.controller.ResourcesPath.API_USER;
 import static com.project.we_go_jim.controller.ResourcesPath.API_USERS;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -33,7 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ExtendWith(MockitoExtension.class)
 @WebMvcTest(UserResourceController.class)
-public class UserResourceControllerUnitTest {
+class UserResourceControllerUnitTest {
 
     @MockBean
     private UserService userService;
@@ -129,20 +130,15 @@ public class UserResourceControllerUnitTest {
         final String url = "/".concat(API_USER);
 
         CreateUserDTO mockUserToCreate = UserMock.createUserDTO();
-        UserDTO mockCreatedUser = UserMock.createdUserDTO();
         String requestBody = objectMapper.writeValueAsString(mockUserToCreate);
-        String responseBody = objectMapper.writeValueAsString(mockCreatedUser);
 
-        when(userService.createUser(mockUserToCreate)).thenReturn(mockCreatedUser);
 
         // ACT
         mockMvc.perform(post(url)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .content(requestBody))
-                .andExpect(status().isCreated())
-                .andExpect(content().json(responseBody));
-
+                .andExpect(status().isCreated());
         // ASSERT
         verify(userService, times(1)).createUser(any());
     }
@@ -154,8 +150,7 @@ public class UserResourceControllerUnitTest {
         CreateUserDTO userBadlyDefinedDTO = UserMock.userBadlyDefinedDTO();
         String requestBody = objectMapper.writeValueAsString(userBadlyDefinedDTO);
 
-        when(userService.createUser(userBadlyDefinedDTO))
-                .thenThrow(BadRequestException.class);
+        doThrow(BadRequestException.class).when(userService).createUser(userBadlyDefinedDTO);
 
         // ACT
         mockMvc.perform(post(url)

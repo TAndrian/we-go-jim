@@ -33,8 +33,8 @@ public class UserResourceController {
 
     @PostMapping(API_USER)
     @ResponseStatus(HttpStatus.CREATED)
-    public UserDTO createUser(@RequestBody CreateUserDTO userToCreate) {
-        return userService.createUser(userToCreate);
+    public void createUser(@RequestBody CreateUserDTO userToCreate) {
+         userService.createUser(userToCreate);
     }
 
     @GetMapping(API_USERS)

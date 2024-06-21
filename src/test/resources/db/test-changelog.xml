@@ -5,7 +5,7 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
     <!-- Create User table -->
-    <changeSet id="1" author="TAndrian">
+    <changeSet id="1" author="TAndrian" context="test">
         <createTable tableName="users">
             <column name="id" type="uuid">
                 <constraints primaryKey="true" nullable="false"/>
@@ -28,7 +28,7 @@
     </changeSet>
 
     <!-- Create Booking table -->
-    <changeSet id="2" author="TAndrian">
+    <changeSet id="2" author="TAndrian" context="test">
         <createTable tableName="booking">
             <column name="id" type="uuid">
                 <constraints primaryKey="true" nullable="false"/>
@@ -42,11 +42,7 @@
     </changeSet>
 
     <!-- Create Many-To-Many relationship -->
-    <changeSet id="3" author="TAndrian">
-        <preConditions onFail="MARK_RAN">
-            <tableExists tableName="users_bookings"/>
-        </preConditions>
-      
+    <changeSet id="3" author="TAndrian" context="test">
         <createTable tableName="users_bookings">
             <column name="user_id" type="uuid">
                 <constraints nullable="false"/>
@@ -58,7 +54,7 @@
     </changeSet>
 
     <!-- Add foreign key constraint for user_id -->
-    <changeSet id="5" author="TAndrian">
+    <changeSet id="5" author="TAndrian" context="test">
         <addForeignKeyConstraint baseTableName="users_bookings"
                                  baseColumnNames="user_id"
                                  constraintName="fk_users_bookings_users"
@@ -68,7 +64,7 @@
     </changeSet>
 
     <!-- Add foreign key constraint for booking_id -->
-    <changeSet id="6" author="TAndrian">
+    <changeSet id="6" author="TAndrian" context="test">
         <addForeignKeyConstraint baseTableName="users_bookings"
                                  baseColumnNames="booking_id"
                                  constraintName="fk_users_bookings_bookings"

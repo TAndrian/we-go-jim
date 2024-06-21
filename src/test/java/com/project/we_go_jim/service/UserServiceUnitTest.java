@@ -4,6 +4,7 @@ import com.project.we_go_jim.dto.CreateUserDTO;
 import com.project.we_go_jim.dto.UserDTO;
 import com.project.we_go_jim.exception.BadRequestException;
 import com.project.we_go_jim.exception.NotFoundException;
+import com.project.we_go_jim.exception.enums.UserExceptionEnum;
 import com.project.we_go_jim.mapper.UserMapper;
 import com.project.we_go_jim.model.UserEntity;
 import com.project.we_go_jim.repository.UserRepository;
@@ -20,7 +21,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -31,7 +31,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class UserServiceUnitTest {
+class UserServiceUnitTest {
 
     @Mock
     private UserRepository userRepository;
@@ -72,7 +72,7 @@ public class UserServiceUnitTest {
 
         // ASSERT
         assertAll(
-                () -> assertEquals(expected, Collections.EMPTY_LIST),
+                () -> assertEquals(Collections.EMPTY_LIST, expected),
                 () -> verify(userMapper, times(1)).toDTOs(anyList()),
                 () -> verify(userRepository, times(1)).findAll()
         );
@@ -100,15 +100,17 @@ public class UserServiceUnitTest {
     }
 
     @Test
-    void when_get_user_by_id_then_return_error_404() {
+    void when_get_user_by_id_then_return_error_404() throws NotFoundException {
         // ARRANGE
+        UUID notFoundUserId = UUID.randomUUID();
 
         // ACT
-        assertThrows(NotFoundException.class,
-                () -> userService.getUserById(any()));
+        NotFoundException exception = assertThrows(NotFoundException.class,
+                () -> userService.getUserById(notFoundUserId));
 
         // ASSERT
         assertAll(
+                () -> assertEquals(exception.getMessage(), UserExceptionEnum.USER_NOT_FOUND.value),
                 () -> verify(userMapper, times(0)).toDTO(any()),
                 () -> verify(userRepository, times(1)).findById(any())
         );
@@ -118,25 +120,18 @@ public class UserServiceUnitTest {
     void given_user_to_create_when_create_user_then_create() {
         // ARRANGE
         CreateUserDTO mockUserDTOToCreate = UserMock.createUserDTO();
-        UserDTO mockSavedUserDto = UserMock.createdUserDTO();
         UserEntity mockUserEntityToCreate = UserMock.createUserEntity();
 
         when(userMapper.toEntity(mockUserDTOToCreate)).thenReturn(mockUserEntityToCreate);
         when(userRepository.save(mockUserEntityToCreate)).thenReturn(mockUserEntityToCreate);
-        when(userMapper.toDTO(any())).thenReturn(mockSavedUserDto);
 
         // ACT
-        UserDTO expected = userService.createUser(mockUserDTOToCreate);
+        userService.createUser(mockUserDTOToCreate);
 
         // ASSERT
         assertAll(
-                () -> assertThat(expected)
-                        .usingRecursiveComparison()
-                        .ignoringFields("id", "createdAt", "updatedAt")
-                        .isEqualTo(mockUserDTOToCreate),
                 () -> verify(userMapper, times(1)).toEntity(any()),
-                () -> verify(userRepository, times(1)).save(any()),
-                () -> verify(userMapper, times(1)).toDTO(any())
+                () -> verify(userRepository, times(1)).save(any())
         );
     }
 
@@ -146,11 +141,39 @@ public class UserServiceUnitTest {
         CreateUserDTO mockUserBadlyDefinedDTO = UserMock.userBadlyDefinedDTO();
 
         // ACT
-        assertThrows(BadRequestException.class,
+        BadRequestException badRequestException = assertThrows(BadRequestException.class,
                 () -> userService.createUser(mockUserBadlyDefinedDTO));
 
         // ASSERT
         assertAll(
+                () -> assertEquals(badRequestException.getMessage(),
+                        UserExceptionEnum.USER_BAD_REQUEST_FIRSTNAME.value),
+
+                () -> verify(userMapper, times(0)).toEntity(any()),
+                () -> verify(userRepository, times(0)).save(any()),
+                () -> verify(userMapper, times(0)).toDTO(any())
+        );
+    }
+
+    @Test
+    void given_email_already_taken_when_create_then_return_error_400() {
+        // ARRANGE
+        CreateUserDTO mockUserBadlyDefinedDTO = UserMock.userBadlyDefinedDTO();
+        mockUserBadlyDefinedDTO.setFirstName("first");
+        mockUserBadlyDefinedDTO.setLastName("last");
+        mockUserBadlyDefinedDTO.setEmail("t@t.com");
+
+        when(userRepository.existsByEmailIgnoreCase(mockUserBadlyDefinedDTO.getEmail())).thenReturn(true);
+
+        // ACT
+        BadRequestException badRequestException = assertThrows(BadRequestException.class,
+                () -> userService.createUser(mockUserBadlyDefinedDTO));
+
+        // ASSERT
+        assertAll(
+                () -> assertEquals(badRequestException.getMessage(),
+                        UserExceptionEnum.USER_BAD_REQUEST_EMAIL_ALREADY_TAKEN.value),
+
                 () -> verify(userMapper, times(0)).toEntity(any()),
                 () -> verify(userRepository, times(0)).save(any()),
                 () -> verify(userMapper, times(0)).toDTO(any())

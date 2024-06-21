@@ -32,11 +32,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDTO createUser(CreateUserDTO userToCreate) {
+    public void createUser(CreateUserDTO userToCreate) {
         checkUserToCreate(userToCreate);
         UserEntity userEntity = userMapper.toEntity(userToCreate);
-        UserEntity savedUser = userRepository.save(userEntity);
-        return userMapper.toDTO(savedUser);
+        userRepository.save(userEntity);
     }
 
     @Override
@@ -54,9 +53,9 @@ public class UserServiceImpl implements UserService {
     private UserEntity findUserById(UUID userId) {
         return userRepository.findById(userId).orElseThrow(() -> {
                     log.info("User not found with id:{}", userId);
-                    throw new NotFoundException(
-                            UserExceptionEnum.USER_EXCEPTION_CODE.value,
-                            UserExceptionEnum.USER_NOT_FOUND.value
+                    return new NotFoundException(
+                            UserExceptionEnum.USER_NOT_FOUND.value,
+                            UserExceptionEnum.USER_EXCEPTION_CODE.value
                     );
                 }
         );
@@ -68,16 +67,35 @@ public class UserServiceImpl implements UserService {
      * @param userToCreate given user to create.
      */
     private void checkUserToCreate(CreateUserDTO userToCreate) {
-        if (userToCreate.getFirstName().equals("") || userToCreate.getLastName().equals("")) {
+        if (userToCreate.getFirstName() == null || userToCreate.getFirstName().isEmpty()) {
             throw new BadRequestException(
-                    UserExceptionEnum.USER_EXCEPTION_CODE.value,
-                    UserExceptionEnum.USER_BAD_REQUEST_USERNAME.value
+                    UserExceptionEnum.USER_BAD_REQUEST_FIRSTNAME.value,
+                    UserExceptionEnum.USER_EXCEPTION_CODE.value
             );
         }
-        if (userToCreate.getEmail() == null || userToCreate.getEmail().equals("")) {
+        if (userToCreate.getLastName() == null || userToCreate.getLastName().isEmpty()) {
             throw new BadRequestException(
-                    UserExceptionEnum.USER_EXCEPTION_CODE.value,
-                    UserExceptionEnum.USER_BAD_REQUEST_EMAIL.value
+                    UserExceptionEnum.USER_BAD_REQUEST_LASTNAME.value,
+                    UserExceptionEnum.USER_EXCEPTION_CODE.value
+            );
+        }
+        if (userToCreate.getEmail() == null || userToCreate.getEmail().isEmpty()) {
+            throw new BadRequestException(
+                    UserExceptionEnum.USER_BAD_REQUEST_EMAIL.value,
+                    UserExceptionEnum.USER_EXCEPTION_CODE.value
+            );
+        }
+        boolean isEmailAlreadyTaken = userRepository.existsByEmailIgnoreCase(userToCreate.getEmail());
+        if (isEmailAlreadyTaken) {
+            throw new BadRequestException(
+                    UserExceptionEnum.USER_BAD_REQUEST_EMAIL_ALREADY_TAKEN.value,
+                    UserExceptionEnum.USER_EXCEPTION_CODE.value
+            );
+        }
+        if (userToCreate.getPassword() == null || userToCreate.getPassword().isEmpty()) {
+            throw new BadRequestException(
+                    UserExceptionEnum.USER_BAD_REQUEST_PASSWORD.value,
+                    UserExceptionEnum.USER_EXCEPTION_CODE.value
             );
         }
     }
