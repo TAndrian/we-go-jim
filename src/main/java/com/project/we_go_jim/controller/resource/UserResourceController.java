@@ -12,14 +12,17 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
 import static com.project.we_go_jim.controller.ResourcesPath.API_USER;
 import static com.project.we_go_jim.controller.ResourcesPath.API_USERS;
+import static com.project.we_go_jim.controller.ResourcesPath.BOOKING;
 
 @RestController
 @RequestMapping(
@@ -34,7 +37,7 @@ public class UserResourceController {
     @PostMapping(API_USER)
     @ResponseStatus(HttpStatus.CREATED)
     public void createUser(@RequestBody CreateUserDTO userToCreate) {
-         userService.createUser(userToCreate);
+        userService.createUser(userToCreate);
     }
 
     @GetMapping(API_USERS)
@@ -47,5 +50,18 @@ public class UserResourceController {
     @ResponseStatus(HttpStatus.OK)
     public UserDTO getUserById(@PathVariable UUID id) {
         return userService.getUserById(id);
+    }
+
+    @PostMapping(API_USER + "/{id}/" + BOOKING)
+    @ResponseStatus(HttpStatus.OK)
+    public UserDTO addBookingToUser(@PathVariable UUID id,
+                                    @RequestParam String startTime,
+                                    @RequestParam String endTime,
+                                    @RequestParam Integer maxParticipant) {
+
+        LocalDateTime bookingStartTime = LocalDateTime.parse(startTime);
+        LocalDateTime bookingEndTime = LocalDateTime.parse(endTime);
+        
+        return userService.addBookingToUser(id, bookingStartTime, bookingEndTime, maxParticipant);
     }
 }

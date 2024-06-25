@@ -1,9 +1,12 @@
 package com.project.we_go_jim.util;
 
+import com.project.we_go_jim.dto.BookingDTO;
 import com.project.we_go_jim.dto.CreateUserDTO;
 import com.project.we_go_jim.dto.UserDTO;
+import com.project.we_go_jim.model.BookingEntity;
 import com.project.we_go_jim.model.UserEntity;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -54,6 +57,46 @@ public class UserMock {
     public static CreateUserDTO userBadlyDefinedDTO() {
         return CreateUserDTO.builder()
                 .firstName("")
+                .build();
+    }
+
+    public static UserEntity userWithoutBookingEntity() {
+        return UserEntity.builder()
+                .id(USER_ID)
+                .firstName("Jane")
+                .lastName("Smith")
+                .email("jane.smith@test.com")
+                .bookings(new HashSet<>())
+                .build();
+    }
+
+    public static UserEntity userAssignedToBookingEntity() {
+        Set<BookingEntity> bookingEntities = new HashSet<>();
+        BookingEntity bookingEntity = BookingMock.bookingEntity();
+        bookingEntity.setMaxParticipant(bookingEntity.getMaxParticipant() + 1);
+        bookingEntities.add(bookingEntity);
+
+        return UserEntity.builder()
+                .id(USER_ID)
+                .firstName("Jane")
+                .lastName("Smith")
+                .email("jane.smith@test.com")
+                .bookings(bookingEntities)
+                .build();
+    }
+
+    public static UserDTO userAssignedToBookingDTO() {
+        Set<BookingDTO> bookingDTOS = new HashSet<>();
+        BookingDTO bookingDTO = BookingMock.bookingDTO();
+        bookingDTO.setMaxParticipant(bookingDTO.getMaxParticipant() + 1);
+        bookingDTOS.add(bookingDTO);
+
+        return UserDTO.builder()
+                .id(USER_ID)
+                .firstName("Jane")
+                .lastName("Smith")
+                .email("jane.smith@test.com")
+                .bookings(bookingDTOS)
                 .build();
     }
 }

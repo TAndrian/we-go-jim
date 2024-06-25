@@ -40,7 +40,7 @@ public class BookingEntity extends TemporalBaseUtil {
     @Column(name = "end_time")
     private LocalDateTime endTime;
     @Column(name = "max_participant")
-    private Integer maxParticipant;
+    private Integer maxParticipant = 0;
 
     @JsonIgnore
     @ManyToMany(mappedBy = "bookings")
