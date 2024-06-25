@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.Set;
 import java.util.UUID;
 
 @Builder
@@ -32,6 +31,4 @@ public class BookingDTO {
     )
     private LocalDateTime endTime;
     private Integer maxParticipant;
-
-    private Set<UserDTO> users;
 }
