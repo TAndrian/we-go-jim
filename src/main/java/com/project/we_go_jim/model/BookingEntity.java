@@ -1,9 +1,9 @@
 package com.project.we_go_jim.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.project.we_go_jim.util.TemporalBaseUtil;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,8 +13,11 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -24,7 +27,6 @@ import java.util.UUID;
 @Table(name = "booking")
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode
 public class BookingEntity extends TemporalBaseUtil {
 
     @Id
@@ -39,4 +41,8 @@ public class BookingEntity extends TemporalBaseUtil {
     private LocalDateTime endTime;
     @Column(name = "max_participant")
     private Integer maxParticipant;
+
+    @JsonIgnore
+    @ManyToMany(mappedBy = "bookings")
+    private Set<UserEntity> users = new HashSet<>();
 }

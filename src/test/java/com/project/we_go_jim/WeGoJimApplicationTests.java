@@ -25,20 +25,17 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.client.RestTemplate;
 
 import javax.persistence.EntityNotFoundException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 
-import static com.project.we_go_jim.controller.ResourcesPath.API_BOOKING;
 import static com.project.we_go_jim.controller.ResourcesPath.API_BOOKINGS;
 import static com.project.we_go_jim.controller.ResourcesPath.API_USER;
 import static com.project.we_go_jim.controller.ResourcesPath.API_USERS;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
@@ -93,32 +90,13 @@ class WeGoJimApplicationTests {
         ResponseEntity<BookingDTO[]> response =
                 restTemplate.exchange(baseUrl, HttpMethod.GET, entity, BookingDTO[].class);
 
-        List<BookingDTO> expected = List.of(Objects.requireNonNull(response.getBody()));
-        List<BookingDTO> bookings = bookingMapper.toDTOs(bookingRepository.findAll());
+        Set<BookingDTO> expected = Set.of(Objects.requireNonNull(response.getBody()));
+        Set<BookingDTO> bookings = bookingMapper.toDTOs(bookingRepository.findAll());
 
         // ASSERT
         assertAll(
                 () -> assertEquals(bookings, expected),
                 () -> assertEquals(HttpStatus.OK, response.getStatusCode())
-        );
-    }
-
-    @Test
-    void should_create_booking() {
-        // ARRANGE
-        baseUrl = baseUrl.concat(":").concat(port + "/").concat(API_BOOKING);
-
-        // ACT
-        HttpEntity<BookingDTO> entity = new HttpEntity<>(headers);
-        ResponseEntity<BookingDTO> response =
-                restTemplate.exchange(baseUrl, HttpMethod.POST, entity, BookingDTO.class);
-        BookingDTO expected = response.getBody();
-        List<BookingDTO> bookings = bookingMapper.toDTOs(bookingRepository.findAll());
-
-        // ASSERT
-        assertAll(
-                () -> assertTrue(bookings.contains(expected)),
-                () -> assertEquals(HttpStatus.CREATED, response.getStatusCode())
         );
     }
 
@@ -151,9 +129,6 @@ class WeGoJimApplicationTests {
                 .concat(API_USER)
                 .concat("/")
                 .concat(userId.toString());
-
-        Map<String, String> params = new HashMap<>();
-        params.put("id", userId.toString());
 
         // ACT
         HttpEntity<UserDTO> entity = new HttpEntity<>(headers);

@@ -31,4 +31,5 @@ public class BookingDTO {
     )
     private LocalDateTime endTime;
     private Integer maxParticipant;
+
 }

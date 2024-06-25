@@ -5,8 +5,9 @@ import com.project.we_go_jim.model.BookingEntity;
 import org.mapstruct.Mapper;
 
 import java.util.List;
+import java.util.Set;
 
 @Mapper(componentModel = "spring")
 public interface BookingMapper {
-    List<BookingDTO> toDTOs(List<BookingEntity> bookingEntities);
+    Set<BookingDTO> toDTOs(List<BookingEntity> bookingEntities);
 }
