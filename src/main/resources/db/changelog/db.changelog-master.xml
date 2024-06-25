@@ -54,7 +54,7 @@
     </changeSet>
 
     <!-- Add foreign key constraint for user_id -->
-    <changeSet id="4" author="TAndrian" runOnChange="true" runAlways="true">
+    <changeSet id="4" author="TAndrian">
         <addForeignKeyConstraint baseTableName="users_bookings"
                                  baseColumnNames="user_id"
                                  constraintName="fk_users_bookings_users"
@@ -64,7 +64,7 @@
     </changeSet>
 
     <!-- Add foreign key constraint for booking_id -->
-    <changeSet id="5" author="TAndrian" runOnChange="true" runAlways="true">
+    <changeSet id="5" author="TAndrian">
         <addForeignKeyConstraint baseTableName="users_bookings"
                                  baseColumnNames="booking_id"
                                  constraintName="fk_users_bookings_bookings"
