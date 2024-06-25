@@ -3,11 +3,11 @@ package com.project.we_go_jim.model;
 import com.project.we_go_jim.util.TemporalBaseUtil;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.proxy.HibernateProxy;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -19,8 +19,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -28,9 +28,13 @@ import java.util.UUID;
 @Builder
 @Getter
 @Setter
-@Table(name = "user")
+@Table(
+        name = "users",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"email"})
+)
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode
 public class UserEntity extends TemporalBaseUtil {
 
     @Id
@@ -42,10 +46,12 @@ public class UserEntity extends TemporalBaseUtil {
     private String firstName;
     @Column(name = "last_name")
     private String lastName;
+
+    @Column(unique = true)
     private String email;
     private String password;
     @ManyToMany(
-            fetch = FetchType.LAZY,
+            fetch = FetchType.EAGER,
             cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}
     )
     @JoinTable(
@@ -54,20 +60,4 @@ public class UserEntity extends TemporalBaseUtil {
             inverseJoinColumns = @JoinColumn(name = "booking_id", referencedColumnName = "id")
     )
     private Set<BookingEntity> bookings = new HashSet<>();
-
-    @Override
-    public final boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null) return false;
-        Class<?> oEffectiveClass = o instanceof HibernateProxy ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass() : o.getClass();
-        Class<?> thisEffectiveClass = this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
-        if (thisEffectiveClass != oEffectiveClass) return false;
-        UserEntity that = (UserEntity) o;
-        return getId() != null && Objects.equals(getId(), that.getId());
-    }
-
-    @Override
-    public final int hashCode() {
-        return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
-    }
 }
