@@ -43,10 +43,6 @@
 
     <!-- Create Many-To-Many relationship -->
     <changeSet id="3" author="TAndrian">
-        <preConditions onFail="MARK_RAN">
-            <tableExists tableName="users_bookings"/>
-        </preConditions>
-      
         <createTable tableName="users_bookings">
             <column name="user_id" type="uuid">
                 <constraints nullable="false"/>
@@ -58,7 +54,7 @@
     </changeSet>
 
     <!-- Add foreign key constraint for user_id -->
-    <changeSet id="5" author="TAndrian">
+    <changeSet id="4" author="TAndrian" runOnChange="true" runAlways="true">
         <addForeignKeyConstraint baseTableName="users_bookings"
                                  baseColumnNames="user_id"
                                  constraintName="fk_users_bookings_users"
@@ -68,7 +64,7 @@
     </changeSet>
 
     <!-- Add foreign key constraint for booking_id -->
-    <changeSet id="6" author="TAndrian">
+    <changeSet id="5" author="TAndrian" runOnChange="true" runAlways="true">
         <addForeignKeyConstraint baseTableName="users_bookings"
                                  baseColumnNames="booking_id"
                                  constraintName="fk_users_bookings_bookings"
