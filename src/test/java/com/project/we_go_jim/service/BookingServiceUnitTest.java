@@ -1,6 +1,8 @@
 package com.project.we_go_jim.service;
 
 import com.project.we_go_jim.dto.BookingDTO;
+import com.project.we_go_jim.exception.ConflictException;
+import com.project.we_go_jim.exception.enums.BookingExceptionEnum;
 import com.project.we_go_jim.mapper.BookingMapper;
 import com.project.we_go_jim.model.BookingEntity;
 import com.project.we_go_jim.model.UserEntity;
@@ -23,6 +25,7 @@ import java.util.Set;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.times;
@@ -31,6 +34,8 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class BookingServiceUnitTest {
+    private static final LocalDateTime mockStartTime = BookingMock.START_TIME;
+    private static final LocalDateTime mockEndTime = BookingMock.END_TIME;
     @Mock
     private BookingRepository bookingRepository;
 
@@ -77,28 +82,28 @@ class BookingServiceUnitTest {
     }
 
     @Test
-    void given_startTime_endTime_user_when_getBookingByStartTimeAndEndTime_then_create_booking() {
+    void given_user_and_available_schedule_when_getBookingByStartTimeAndEndTime_then_create_booking() {
         // ARRANGE
-        UserEntity mockUserToAddToBooking = UserMock.userEntity();
-        BookingEntity mockNewBookingEntity = BookingMock.newBookingEntity();
-        LocalDateTime mockStartTime = BookingMock.START_TIME;
-        LocalDateTime mockEndTime = BookingMock.END_TIME;
+        Integer mockMaxParticipant = 0;
 
-        when(bookingRepository.save(any())).thenReturn(mockNewBookingEntity);
+        BookingEntity mockNewBookingEntity = BookingMock.newBookingEntity();
+        UserEntity mockUserToAssignToBookingEntity = UserMock.userWithoutBookingEntity();
+
+        when(bookingRepository.save(any()))
+                .thenReturn(mockNewBookingEntity);
 
         // ACT
-        BookingEntity expected =
-                bookingService.getBookingByStartTimeAndEndTime(
-                        mockStartTime,
-                        mockEndTime,
-                        3,
-                        mockUserToAddToBooking);
+        BookingEntity expected = bookingService.getBookingByStartTimeAndEndTime(
+                mockStartTime,
+                mockEndTime,
+                mockMaxParticipant,
+                mockUserToAssignToBookingEntity);
 
         // ASSERT
         assertAll(
                 () -> verify(bookingRepository, times(1)).save(any()),
-                () -> verify(bookingRepository, times(1)).findByStartTimeAndEndTime(any(), any()),
-                () -> assertEquals(mockNewBookingEntity.getMaxParticipant(), expected.getMaxParticipant()),
+                () -> verify(bookingRepository, times(1))
+                        .findByStartTimeAndEndTime(any(), any()),
                 () -> assertThat(mockNewBookingEntity)
                         .usingRecursiveComparison()
                         .ignoringFields("id", "createdAt", "updatedAt")
@@ -107,31 +112,57 @@ class BookingServiceUnitTest {
     }
 
     @Test
-    void given_startTime_endTime_when_getBookingByStartTimeAndEndTime_then_return_booking() {
+    void given_user_and_available_schedule_when_getBookingByStartTimeAndEndTime_then_return_booking() {
         // ARRANGE
-        UserEntity mockUserToAddToBooking = UserMock.userEntity();
-        BookingEntity mockBookingEntity = BookingMock.bookingEntity();
-        LocalDateTime mockStartTime = BookingMock.START_TIME;
-        LocalDateTime mockEndTime = BookingMock.END_TIME;
+        Integer mockMaxParticipant = BookingMock.bookingEntity().getMaxParticipant();
+
+        BookingEntity mockBookingFoundByStartTimeAndEndTime = BookingMock.bookingEntity();
+        UserEntity mockUserToAssignToBookingEntity = UserMock.userEntity();
 
         when(bookingRepository.findByStartTimeAndEndTime(mockStartTime, mockEndTime))
-                .thenReturn(Optional.ofNullable(mockBookingEntity));
+                .thenReturn(Optional.ofNullable(mockBookingFoundByStartTimeAndEndTime));
 
         // ACT
-        BookingEntity expected =
-                bookingService.getBookingByStartTimeAndEndTime(mockStartTime,
-                        mockEndTime,
-                        1,
-                        mockUserToAddToBooking);
+        BookingEntity expected = bookingService.getBookingByStartTimeAndEndTime(
+                mockStartTime,
+                mockEndTime,
+                mockMaxParticipant,
+                mockUserToAssignToBookingEntity);
 
         // ASSERT
         assertAll(
                 () -> verify(bookingRepository, times(0)).save(any()),
-                () -> verify(bookingRepository, times(1)).findByStartTimeAndEndTime(any(), any()),
-                () -> assertThat(mockBookingEntity)
+                () -> verify(bookingRepository, times(1))
+                        .findByStartTimeAndEndTime(any(), any()),
+                () -> assertThat(mockBookingFoundByStartTimeAndEndTime)
                         .usingRecursiveComparison()
                         .ignoringFields("id", "createdAt", "updatedAt")
                         .isEqualTo(expected)
+        );
+    }
+
+    @Test
+    void given_user_and_unavailable_schedule_when_getBookingByStartTimeAndEndTime_then_throw_conflict_error() {
+        // ARRANGE
+        Integer mockMaxParticipant = BookingMock.MAX_PARTICIPANT;
+        UserEntity mockUserToAssignToBookingEntity = UserMock.userEntity();
+
+        // ACT
+        ConflictException exception = assertThrows(ConflictException.class, () ->
+                bookingService.getBookingByStartTimeAndEndTime(
+                        mockStartTime,
+                        mockEndTime,
+                        mockMaxParticipant,
+                        mockUserToAssignToBookingEntity)
+        );
+
+        // ASSERT
+        assertAll(
+                () -> verify(bookingRepository, times(0)).save(any()),
+                () -> verify(bookingRepository, times(0))
+                        .findByStartTimeAndEndTime(any(), any()),
+                () -> assertEquals(exception.getMessage(),
+                        BookingExceptionEnum.BOOKING_MAX_PARTICIPANT_OVER_TEN.getValue())
         );
     }
 }

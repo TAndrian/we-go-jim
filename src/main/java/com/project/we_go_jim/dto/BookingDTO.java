@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.UUID;
 
 @Builder
@@ -22,13 +23,15 @@ public class BookingDTO {
 
     @JsonFormat(
             shape = JsonFormat.Shape.STRING,
-            pattern = "yyyy-MM-dd HH:mm:ss"
+            pattern = "yyyy-MM-dd'T'HH:mm:ss"
     )
     private LocalDateTime startTime;
     @JsonFormat(
             shape = JsonFormat.Shape.STRING,
-            pattern = "yyyy-MM-dd HH:mm:ss"
+            pattern = "yyyy-MM-dd'T'HH:mm:ss"
     )
     private LocalDateTime endTime;
     private Integer maxParticipant;
+
+    private Set<UserDTO> users;
 }

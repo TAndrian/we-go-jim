@@ -45,8 +45,8 @@ public class BookingServiceImpl implements BookingService {
                                                          LocalDateTime endTime,
                                                          Integer maxParticipant,
                                                          UserEntity user) {
-        Optional<BookingEntity> booking = bookingRepository.findByStartTimeAndEndTime(startTime, endTime);
         checkIfSlotIsAvailable(maxParticipant);
+        Optional<BookingEntity> booking = bookingRepository.findByStartTimeAndEndTime(startTime, endTime);
         return booking.orElseGet(() -> createBooking(startTime, endTime, user));
     }
 

@@ -1,6 +1,5 @@
 package com.project.we_go_jim.util;
 
-import com.project.we_go_jim.dto.BookingDTO;
 import com.project.we_go_jim.dto.CreateUserDTO;
 import com.project.we_go_jim.dto.UserDTO;
 import com.project.we_go_jim.model.BookingEntity;
@@ -20,7 +19,6 @@ public class UserMock {
                 .firstName("John")
                 .lastName("Doe")
                 .email("john.doe@test.com")
-                .bookings(Set.of(BookingMock.bookingEntity()))
                 .build();
     }
 
@@ -30,7 +28,6 @@ public class UserMock {
                 .firstName("John")
                 .lastName("Doe")
                 .email("john.doe@test.com")
-                .bookings(Set.of(BookingMock.bookingDTO()))
                 .build();
     }
 
@@ -41,7 +38,6 @@ public class UserMock {
                 .lastName("Doe")
                 .email("john.doe@test.com")
                 .password("123456")
-                .bookings(Set.of())
                 .build();
     }
 
@@ -50,7 +46,6 @@ public class UserMock {
                 .firstName("John")
                 .lastName("Doe")
                 .email("john.doe@test.com")
-                .bookings(Set.of())
                 .build();
     }
 
@@ -86,17 +81,12 @@ public class UserMock {
     }
 
     public static UserDTO userAssignedToBookingDTO() {
-        Set<BookingDTO> bookingDTOS = new HashSet<>();
-        BookingDTO bookingDTO = BookingMock.bookingDTO();
-        bookingDTO.setMaxParticipant(bookingDTO.getMaxParticipant() + 1);
-        bookingDTOS.add(bookingDTO);
 
         return UserDTO.builder()
                 .id(USER_ID)
                 .firstName("Jane")
                 .lastName("Smith")
                 .email("jane.smith@test.com")
-                .bookings(bookingDTOS)
                 .build();
     }
 }

@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.Set;
 import java.util.UUID;
 
 @Builder
@@ -23,15 +22,14 @@ public class UserDTO {
     private String firstName;
     private String lastName;
     private String email;
-    private Set<BookingDTO> bookings;
     @JsonFormat(
             shape = JsonFormat.Shape.STRING,
-            pattern = "yyyy-MM-dd HH:mm"
+            pattern = "yyyy-MM-dd'T'HH:mm"
     )
     private LocalDateTime createdAt;
     @JsonFormat(
             shape = JsonFormat.Shape.STRING,
-            pattern = "yyyy-MM-dd HH:mm"
+            pattern = "yyyy-MM-dd'T'HH:mm"
     )
     private LocalDateTime updatedAt;
 }
