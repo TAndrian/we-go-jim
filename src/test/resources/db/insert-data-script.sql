@@ -24,7 +24,7 @@ INSERT INTO users (id, first_name, last_name, email, password) VALUES
 
 INSERT INTO booking (id, start_time, end_time, max_participant) VALUES
   ('f255538a-8a02-4c43-adf4-aa37cce43894', '2024-06-19T12:00:00', '2024-06-19T12:30:00', 10),
-  ('3fa0e077-690e-4847-89b5-b3881534af3f', '2024-06-22T14:00:00', '2024-06-22T16:00:00', 5);
+  ('3fa0e077-690e-4847-89b5-b3881534af3f', '2024-06-22T14:00:00', '2024-06-22T14:30:00', 5);
 
 INSERT INTO users_bookings (user_id, booking_id) VALUES
   ((SELECT id FROM users WHERE email = 'john.doe@example.com'), (SELECT id FROM booking WHERE start_time = '2024-06-19T12:00:00')),
