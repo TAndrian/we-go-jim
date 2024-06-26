@@ -1,6 +1,6 @@
 package com.project.we_go_jim.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.project.we_go_jim.util.TemporalBaseUtil;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,6 +11,7 @@ import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
@@ -40,9 +41,9 @@ public class BookingEntity extends TemporalBaseUtil {
     @Column(name = "end_time")
     private LocalDateTime endTime;
     @Column(name = "max_participant")
-    private Integer maxParticipant;
+    private Integer maxParticipant = 0;
 
-    @JsonIgnore
-    @ManyToMany(mappedBy = "bookings")
+    @JsonBackReference
+    @ManyToMany(mappedBy = "bookings", fetch = FetchType.EAGER)
     private Set<UserEntity> users = new HashSet<>();
 }

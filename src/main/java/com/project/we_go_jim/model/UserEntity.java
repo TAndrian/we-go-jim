@@ -11,7 +11,6 @@ import org.hibernate.annotations.ColumnDefault;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -49,7 +48,6 @@ public class UserEntity extends TemporalBaseUtil {
     private String email;
     private String password;
     @ManyToMany(
-            fetch = FetchType.EAGER,
             cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}
     )
     @JoinTable(

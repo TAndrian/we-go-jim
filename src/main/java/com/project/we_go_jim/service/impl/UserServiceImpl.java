@@ -6,15 +6,19 @@ import com.project.we_go_jim.exception.BadRequestException;
 import com.project.we_go_jim.exception.NotFoundException;
 import com.project.we_go_jim.exception.enums.UserExceptionEnum;
 import com.project.we_go_jim.mapper.UserMapper;
+import com.project.we_go_jim.model.BookingEntity;
 import com.project.we_go_jim.model.UserEntity;
 import com.project.we_go_jim.repository.UserRepository;
+import com.project.we_go_jim.service.BookingService;
 import com.project.we_go_jim.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -25,6 +29,8 @@ public class UserServiceImpl implements UserService {
 
     private final UserMapper userMapper;
     private final UserRepository userRepository;
+
+    private final BookingService bookingService;
 
     @Override
     public List<UserDTO> getUsers() {
@@ -42,6 +48,27 @@ public class UserServiceImpl implements UserService {
     public UserDTO getUserById(UUID userId) {
         UserEntity user = findUserById(userId);
         return userMapper.toDTO(user);
+    }
+
+    @Override
+    public UserDTO addBookingToUser(UUID userId,
+                                    LocalDateTime startTime,
+                                    LocalDateTime endTime,
+                                    Integer maxParticipant) {
+        UserEntity user = findUserById(userId);
+        BookingEntity availableBooking =
+                bookingService.getBookingByStartTimeAndEndTime(
+                        startTime,
+                        endTime,
+                        maxParticipant,
+                        user
+                );
+        availableBooking.setMaxParticipant(availableBooking.getMaxParticipant() + 1);
+        Set<BookingEntity> userBookings = user.getBookings();
+        userBookings.add(availableBooking);
+        user.setBookings(userBookings);
+        UserEntity userAssignedToBooking = userRepository.save(user);
+        return userMapper.toDTO(userAssignedToBooking);
     }
 
     /**

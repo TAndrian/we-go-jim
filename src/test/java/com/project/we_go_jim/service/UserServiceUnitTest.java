@@ -6,9 +6,11 @@ import com.project.we_go_jim.exception.BadRequestException;
 import com.project.we_go_jim.exception.NotFoundException;
 import com.project.we_go_jim.exception.enums.UserExceptionEnum;
 import com.project.we_go_jim.mapper.UserMapper;
+import com.project.we_go_jim.model.BookingEntity;
 import com.project.we_go_jim.model.UserEntity;
 import com.project.we_go_jim.repository.UserRepository;
 import com.project.we_go_jim.service.impl.UserServiceImpl;
+import com.project.we_go_jim.util.BookingMock;
 import com.project.we_go_jim.util.UserMock;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,11 +18,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -38,6 +42,9 @@ class UserServiceUnitTest {
 
     @Mock
     private UserMapper userMapper;
+
+    @Mock
+    private BookingService bookingService;
 
     @InjectMocks
     private UserServiceImpl userService;
@@ -177,6 +184,51 @@ class UserServiceUnitTest {
                 () -> verify(userMapper, times(0)).toEntity(any()),
                 () -> verify(userRepository, times(0)).save(any()),
                 () -> verify(userMapper, times(0)).toDTO(any())
+        );
+    }
+
+    @Test
+    void when_addBookingToUser_then_add_booking() {
+        // ARRANGE
+        UUID mockUserId = UserMock.USER_ID;
+        LocalDateTime mockStartTime = BookingMock.START_TIME;
+        LocalDateTime mockEndTime = BookingMock.END_TIME;
+        Integer mockMaxParticipant = BookingMock.bookingDTO().getMaxParticipant();
+
+        UserEntity mockUserWithoutBookingEntity = UserMock.userWithoutBookingEntity();
+        BookingEntity mockBookingAssignedToUserEntity = BookingMock.bookingAssignedToUser();
+        UserEntity mockUserAssignedToBookingEntity = UserMock.userAssignedToBookingEntity();
+        UserDTO mockUserAssignedToBookingDTO = UserMock.userAssignedToBookingDTO();
+
+        when(userRepository.findById(mockUserId))
+                .thenReturn(Optional.ofNullable(mockUserWithoutBookingEntity));
+
+        when(bookingService.getBookingByStartTimeAndEndTime(
+                mockStartTime,
+                mockEndTime,
+                mockMaxParticipant,
+                mockUserWithoutBookingEntity
+        )).thenReturn(mockBookingAssignedToUserEntity);
+
+        when(userRepository.save(any()))
+                .thenReturn(mockUserAssignedToBookingEntity);
+
+        when(userMapper.toDTO(any()))
+                .thenReturn(mockUserAssignedToBookingDTO);
+
+        // ACT
+        UserDTO expected = userService.addBookingToUser(mockUserId, mockStartTime, mockEndTime, mockMaxParticipant);
+
+        // ASSERT
+        assertAll(
+                () -> verify(userRepository, times(1)).findById(any()),
+                () -> verify(bookingService, times(1))
+                        .getBookingByStartTimeAndEndTime(any(), any(), any(), any()),
+                () -> verify(userMapper, times(1)).toDTO(any()),
+                () -> assertThat(mockUserAssignedToBookingDTO)
+                        .usingRecursiveComparison()
+                        .ignoringFields("id", "createdAt", "updatedAt")
+                        .isEqualTo(expected)
         );
     }
 }
