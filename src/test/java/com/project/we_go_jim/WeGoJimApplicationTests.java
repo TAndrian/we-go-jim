@@ -169,7 +169,6 @@ class WeGoJimApplicationTests {
                 .concat("endTime=".concat(endTime.toString()).concat("&"))
                 .concat("maxParticipant=".concat(String.valueOf(maxParticipant)));
 
-
         // ACT
         HttpEntity<UserDTO> entity = new HttpEntity<>(headers);
         ResponseEntity<UserDTO> response =
@@ -181,6 +180,7 @@ class WeGoJimApplicationTests {
         // ASSERT
         assertAll(
                 () -> assertEquals(HttpStatus.OK, response.getStatusCode()),
+                () -> assertEquals(booking.getUsers().size(), 2),
                 () -> assertTrue(match)
         );
     }
