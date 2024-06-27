@@ -100,10 +100,7 @@
                 <artifactId>liquibase-maven-plugin</artifactId>
                 <version>4.28.0</version>
                 <configuration>
-                    <changeLogFile>./db/changelog/db.changelog-master.xml</changeLogFile>
-                    <url>jdbc:postgresql://localhost:5432/gym</url>
-                    <username>postgres</username>
-                    <password>123456</password>
+                    <propertyFile>src/main/resources/liquibase.properties</propertyFile>
                 </configuration>
             </plugin>
         </plugins>
