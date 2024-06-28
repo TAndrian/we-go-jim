@@ -1,6 +1,7 @@
 package com.project.we_go_jim.util;
 
 import com.project.we_go_jim.dto.BookingDTO;
+import com.project.we_go_jim.dto.UserBookingHistoryDTO;
 import com.project.we_go_jim.dto.UserDTO;
 import com.project.we_go_jim.model.BookingEntity;
 import com.project.we_go_jim.model.UserEntity;
@@ -37,6 +38,14 @@ public class BookingMock {
                 .endTime(END_TIME)
                 .maxParticipant(3)
                 .users(users)
+                .build();
+    }
+
+    public static UserBookingHistoryDTO userBookingHistoryDTO() {
+        return UserBookingHistoryDTO.builder()
+                .id(BOOKING_ID)
+                .startTime(START_TIME)
+                .endTime(END_TIME)
                 .build();
     }
 

@@ -1,6 +1,7 @@
 package com.project.we_go_jim;
 
 import com.project.we_go_jim.dto.BookingDTO;
+import com.project.we_go_jim.dto.UserBookingHistoryDTO;
 import com.project.we_go_jim.dto.UserDTO;
 import com.project.we_go_jim.mapper.BookingMapper;
 import com.project.we_go_jim.mapper.UserMapper;
@@ -36,6 +37,7 @@ import static com.project.we_go_jim.controller.ResourcesPath.API_BOOKINGS;
 import static com.project.we_go_jim.controller.ResourcesPath.API_USER;
 import static com.project.we_go_jim.controller.ResourcesPath.API_USERS;
 import static com.project.we_go_jim.controller.ResourcesPath.BOOKING;
+import static com.project.we_go_jim.controller.ResourcesPath.USER;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -182,6 +184,33 @@ class WeGoJimApplicationTests {
                 () -> assertEquals(HttpStatus.OK, response.getStatusCode()),
                 () -> assertEquals(2, booking.getUsers().size()),
                 () -> assertTrue(match)
+        );
+    }
+
+    @Test
+    void should_get_bookings_by_user_id() {
+        // ARRANGE
+        UUID userId = UserMock.JOHN_ID;
+
+        baseUrl = baseUrl.concat(":")
+                .concat(port + "/")
+                .concat(API_BOOKINGS + "/")
+                .concat(USER + "/" + userId);
+
+        // ACT
+        HttpEntity<UserBookingHistoryDTO[]> entity = new HttpEntity<>(headers);
+        ResponseEntity<UserBookingHistoryDTO[]> response =
+                restTemplate.exchange(baseUrl, HttpMethod.GET, entity, UserBookingHistoryDTO[].class);
+
+        Set<UserBookingHistoryDTO> responseBody = Set.of(Objects.requireNonNull(response.getBody()));
+        Set<UserBookingHistoryDTO> userBookingHistoryDTOs =
+                bookingMapper.toUserBookingHistoryDTOs(bookingRepository.findByUsers_Id(userId));
+
+        // ASSERT
+        assertAll(
+                () -> assertEquals(HttpStatus.OK, response.getStatusCode()),
+                () -> assertThat(userBookingHistoryDTOs)
+                        .isEqualTo(responseBody)
         );
     }
 }

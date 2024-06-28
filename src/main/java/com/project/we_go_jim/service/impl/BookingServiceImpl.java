@@ -1,12 +1,16 @@
 package com.project.we_go_jim.service.impl;
 
 import com.project.we_go_jim.dto.BookingDTO;
+import com.project.we_go_jim.dto.UserBookingHistoryDTO;
 import com.project.we_go_jim.exception.ConflictException;
+import com.project.we_go_jim.exception.NotFoundException;
 import com.project.we_go_jim.exception.enums.BookingExceptionEnum;
+import com.project.we_go_jim.exception.enums.UserExceptionEnum;
 import com.project.we_go_jim.mapper.BookingMapper;
 import com.project.we_go_jim.model.BookingEntity;
 import com.project.we_go_jim.model.UserEntity;
 import com.project.we_go_jim.repository.BookingRepository;
+import com.project.we_go_jim.repository.UserRepository;
 import com.project.we_go_jim.service.BookingService;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -16,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 @Service
 @AllArgsConstructor
@@ -26,6 +31,7 @@ public class BookingServiceImpl implements BookingService {
     public static final int MAX_PARTICIPANT = 10;
     private final BookingRepository bookingRepository;
     private final BookingMapper bookingMapper;
+    private final UserRepository userRepository;
 
     @Override
     public Set<BookingDTO> getBookings() {
@@ -48,6 +54,17 @@ public class BookingServiceImpl implements BookingService {
         checkIfSlotIsAvailable(maxParticipant);
         Optional<BookingEntity> booking = bookingRepository.findByStartTimeAndEndTime(startTime, endTime);
         return booking.orElseGet(() -> createBooking(startTime, endTime, user));
+    }
+
+    @Override
+    public Set<UserBookingHistoryDTO> getBookingsByUserId(UUID userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new NotFoundException(
+                    UserExceptionEnum.USER_NOT_FOUND.value,
+                    UserExceptionEnum.USER_EXCEPTION_CODE.value
+            );
+        }
+        return bookingMapper.toUserBookingHistoryDTOs(bookingRepository.findByUsers_Id(userId));
     }
 
     /**
