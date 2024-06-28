@@ -28,9 +28,8 @@
     </scm>
     <properties>
         <java.version>17</java.version>
-        <sonar.organization>${env.SONAR_CLOUD_ORGANIZATION}</sonar.organization>
+        <sonar.organization>tandrian</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
-        <sonar.login>${env.SONAR_CLOUD_TOKEN}</sonar.login>
         <sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
     </properties>
     <dependencies>
