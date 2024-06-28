@@ -36,6 +36,7 @@ import static com.project.we_go_jim.controller.ResourcesPath.API_BOOKINGS;
 import static com.project.we_go_jim.controller.ResourcesPath.API_USER;
 import static com.project.we_go_jim.controller.ResourcesPath.API_USERS;
 import static com.project.we_go_jim.controller.ResourcesPath.BOOKING;
+import static com.project.we_go_jim.controller.ResourcesPath.USER;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -182,6 +183,31 @@ class WeGoJimApplicationTests {
                 () -> assertEquals(HttpStatus.OK, response.getStatusCode()),
                 () -> assertEquals(2, booking.getUsers().size()),
                 () -> assertTrue(match)
+        );
+    }
+
+    @Test
+    void should_get_bookings_by_user_id() {
+        // ARRANGE
+        UUID userId = UserMock.JOHN_ID;
+
+        baseUrl = baseUrl.concat(":")
+                .concat(port + "/")
+                .concat(API_BOOKINGS + "/")
+                .concat(USER + "/" + userId);
+
+        // ACT
+        HttpEntity<BookingDTO[]> entity = new HttpEntity<>(headers);
+        ResponseEntity<BookingDTO[]> response =
+                restTemplate.exchange(baseUrl, HttpMethod.GET, entity, BookingDTO[].class);
+
+        Set<BookingDTO> responseBody = Set.of(Objects.requireNonNull(response.getBody()));
+        Set<BookingDTO> bookingDTOS = bookingMapper.toDTOs(bookingRepository.findByUsers_Id(userId));
+
+        // ASSERT
+        assertAll(
+                () -> assertEquals(HttpStatus.OK, response.getStatusCode()),
+                () -> assertEquals(responseBody, bookingDTOS)
         );
     }
 }
