@@ -9,6 +9,7 @@ import com.project.we_go_jim.repository.BookingRepository;
 import com.project.we_go_jim.repository.UserRepository;
 import com.project.we_go_jim.util.DbCommonOperation;
 import com.project.we_go_jim.util.UserMock;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,7 +26,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.client.RestTemplate;
 
-import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -180,7 +180,7 @@ class WeGoJimApplicationTests {
         // ASSERT
         assertAll(
                 () -> assertEquals(HttpStatus.OK, response.getStatusCode()),
-                () -> assertEquals(booking.getUsers().size(), 2),
+                () -> assertEquals(2, booking.getUsers().size()),
                 () -> assertTrue(match)
         );
     }
