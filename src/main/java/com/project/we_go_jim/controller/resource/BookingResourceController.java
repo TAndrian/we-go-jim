@@ -1,6 +1,7 @@
 package com.project.we_go_jim.controller.resource;
 
 import com.project.we_go_jim.dto.BookingDTO;
+import com.project.we_go_jim.dto.UserBookingHistoryDTO;
 import com.project.we_go_jim.service.BookingService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -36,7 +37,7 @@ public class BookingResourceController {
 
     @GetMapping(API_BOOKINGS + "/" + USER + "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Set<BookingDTO> getBookingsByUserId(@PathVariable UUID id) {
+    public Set<UserBookingHistoryDTO> getUserBookingHistory(@PathVariable UUID id) {
         return bookingService.getBookingsByUserId(id);
     }
 }

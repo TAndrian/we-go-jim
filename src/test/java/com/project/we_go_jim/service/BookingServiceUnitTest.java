@@ -1,6 +1,7 @@
 package com.project.we_go_jim.service;
 
 import com.project.we_go_jim.dto.BookingDTO;
+import com.project.we_go_jim.dto.UserBookingHistoryDTO;
 import com.project.we_go_jim.exception.ConflictException;
 import com.project.we_go_jim.exception.NotFoundException;
 import com.project.we_go_jim.exception.enums.BookingExceptionEnum;
@@ -181,23 +182,23 @@ class BookingServiceUnitTest {
         // ARRANGE
         List<BookingEntity> mockBookings = new ArrayList<>();
         mockBookings.add(BookingMock.bookingEntity());
-        Set<BookingDTO> mockBookingDTOs = new HashSet<>();
-        mockBookingDTOs.add(BookingMock.bookingDTO());
+        Set<UserBookingHistoryDTO> mockBookingDTOs = new HashSet<>();
+        mockBookingDTOs.add(BookingMock.userBookingHistoryDTO());
 
         when(userRepository.existsById(MOCK_USER_ID)).thenReturn(true);
         when(bookingRepository.findByUsers_Id(MOCK_USER_ID))
                 .thenReturn(mockBookings);
-        when(bookingMapper.toDTOs(mockBookings))
+        when(bookingMapper.toUserBookingHistoryDTOs(mockBookings))
                 .thenReturn(mockBookingDTOs);
 
         // ACT
-        Set<BookingDTO> expected = bookingService.getBookingsByUserId(MOCK_USER_ID);
+        Set<UserBookingHistoryDTO> expected = bookingService.getBookingsByUserId(MOCK_USER_ID);
 
         // ASSERT
         assertAll(
                 () -> verify(userRepository, times(1)).existsById(any()),
                 () -> verify(bookingRepository, times(1)).findByUsers_Id(any()),
-                () -> verify(bookingMapper, times(1)).toDTOs(anyList()),
+                () -> verify(bookingMapper, times(1)).toUserBookingHistoryDTOs(anyList()),
                 () -> assertEquals(mockBookingDTOs, expected)
         );
     }
@@ -208,13 +209,13 @@ class BookingServiceUnitTest {
         when(userRepository.existsById(MOCK_USER_ID)).thenReturn(true);
 
         // ACT
-        Set<BookingDTO> expected = bookingService.getBookingsByUserId(MOCK_USER_ID);
+        Set<UserBookingHistoryDTO> expected = bookingService.getBookingsByUserId(MOCK_USER_ID);
 
         // ASSERT
         assertAll(
                 () -> verify(userRepository, times(1)).existsById(any()),
                 () -> verify(bookingRepository, times(1)).findByUsers_Id(any()),
-                () -> verify(bookingMapper, times(1)).toDTOs(anyList()),
+                () -> verify(bookingMapper, times(1)).toUserBookingHistoryDTOs(anyList()),
                 () -> assertEquals(Collections.emptySet(), expected)
         );
     }

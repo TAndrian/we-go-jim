@@ -1,6 +1,7 @@
 package com.project.we_go_jim;
 
 import com.project.we_go_jim.dto.BookingDTO;
+import com.project.we_go_jim.dto.UserBookingHistoryDTO;
 import com.project.we_go_jim.dto.UserDTO;
 import com.project.we_go_jim.mapper.BookingMapper;
 import com.project.we_go_jim.mapper.UserMapper;
@@ -197,17 +198,19 @@ class WeGoJimApplicationTests {
                 .concat(USER + "/" + userId);
 
         // ACT
-        HttpEntity<BookingDTO[]> entity = new HttpEntity<>(headers);
-        ResponseEntity<BookingDTO[]> response =
-                restTemplate.exchange(baseUrl, HttpMethod.GET, entity, BookingDTO[].class);
+        HttpEntity<UserBookingHistoryDTO[]> entity = new HttpEntity<>(headers);
+        ResponseEntity<UserBookingHistoryDTO[]> response =
+                restTemplate.exchange(baseUrl, HttpMethod.GET, entity, UserBookingHistoryDTO[].class);
 
-        Set<BookingDTO> responseBody = Set.of(Objects.requireNonNull(response.getBody()));
-        Set<BookingDTO> bookingDTOS = bookingMapper.toDTOs(bookingRepository.findByUsers_Id(userId));
+        Set<UserBookingHistoryDTO> responseBody = Set.of(Objects.requireNonNull(response.getBody()));
+        Set<UserBookingHistoryDTO> userBookingHistoryDTOs =
+                bookingMapper.toUserBookingHistoryDTOs(bookingRepository.findByUsers_Id(userId));
 
         // ASSERT
         assertAll(
                 () -> assertEquals(HttpStatus.OK, response.getStatusCode()),
-                () -> assertEquals(responseBody, bookingDTOS)
+                () -> assertThat(userBookingHistoryDTOs)
+                        .isEqualTo(responseBody)
         );
     }
 }
