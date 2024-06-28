@@ -2,11 +2,14 @@ package com.project.we_go_jim.service;
 
 import com.project.we_go_jim.dto.BookingDTO;
 import com.project.we_go_jim.exception.ConflictException;
+import com.project.we_go_jim.exception.NotFoundException;
 import com.project.we_go_jim.exception.enums.BookingExceptionEnum;
+import com.project.we_go_jim.exception.enums.UserExceptionEnum;
 import com.project.we_go_jim.mapper.BookingMapper;
 import com.project.we_go_jim.model.BookingEntity;
 import com.project.we_go_jim.model.UserEntity;
 import com.project.we_go_jim.repository.BookingRepository;
+import com.project.we_go_jim.repository.UserRepository;
 import com.project.we_go_jim.service.impl.BookingServiceImpl;
 import com.project.we_go_jim.util.BookingMock;
 import com.project.we_go_jim.util.UserMock;
@@ -17,10 +20,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -34,6 +40,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class BookingServiceUnitTest {
+    public static final UUID MOCK_USER_ID = UserMock.USER_ID;
     private static final LocalDateTime mockStartTime = BookingMock.START_TIME;
     private static final LocalDateTime mockEndTime = BookingMock.END_TIME;
     @Mock
@@ -41,6 +48,9 @@ class BookingServiceUnitTest {
 
     @Mock
     private BookingMapper bookingMapper;
+
+    @Mock
+    private UserRepository userRepository;
 
     @InjectMocks
     private BookingServiceImpl bookingService;
@@ -163,6 +173,71 @@ class BookingServiceUnitTest {
                         .findByStartTimeAndEndTime(any(), any()),
                 () -> assertEquals(exception.getMessage(),
                         BookingExceptionEnum.BOOKING_MAX_PARTICIPANT_OVER_TEN.getValue())
+        );
+    }
+
+    @Test
+    void given_userId_when_getBookingsByUserId_then_return_bookings() {
+        // ARRANGE
+        List<BookingEntity> mockBookings = new ArrayList<>();
+        mockBookings.add(BookingMock.bookingEntity());
+        Set<BookingDTO> mockBookingDTOs = new HashSet<>();
+        mockBookingDTOs.add(BookingMock.bookingDTO());
+
+        when(userRepository.existsById(MOCK_USER_ID)).thenReturn(true);
+        when(bookingRepository.findByUsers_Id(MOCK_USER_ID))
+                .thenReturn(mockBookings);
+        when(bookingMapper.toDTOs(mockBookings))
+                .thenReturn(mockBookingDTOs);
+
+        // ACT
+        Set<BookingDTO> expected = bookingService.getBookingsByUserId(MOCK_USER_ID);
+
+        // ASSERT
+        assertAll(
+                () -> verify(userRepository, times(1)).existsById(any()),
+                () -> verify(bookingRepository, times(1)).findByUsers_Id(any()),
+                () -> verify(bookingMapper, times(1)).toDTOs(anyList()),
+                () -> assertEquals(mockBookingDTOs, expected)
+        );
+    }
+
+    @Test
+    void given_userId_when_getBookingsByUserId_then_return_empty_collections() {
+        // ARRANGE
+        when(userRepository.existsById(MOCK_USER_ID)).thenReturn(true);
+
+        // ACT
+        Set<BookingDTO> expected = bookingService.getBookingsByUserId(MOCK_USER_ID);
+
+        // ASSERT
+        assertAll(
+                () -> verify(userRepository, times(1)).existsById(any()),
+                () -> verify(bookingRepository, times(1)).findByUsers_Id(any()),
+                () -> verify(bookingMapper, times(1)).toDTOs(anyList()),
+                () -> assertEquals(Collections.emptySet(), expected)
+        );
+    }
+
+    @Test
+    void given_not_found_user_when_getBookingsByUserId_then_return_throw_not_found_exception() {
+        // ARRANGE
+        UUID mockNotFoundUserId = UUID.randomUUID();
+        when(userRepository.existsById(mockNotFoundUserId)).thenReturn(false);
+
+        // ACT
+        NotFoundException exception =
+                assertThrows(
+                        NotFoundException.class,
+                        () -> bookingService.getBookingsByUserId(mockNotFoundUserId)
+                );
+
+        // ASSERT
+        assertAll(
+                () -> verify(userRepository, times(1)).existsById(any()),
+                () -> verify(bookingRepository, times(0)).findByUsers_Id(any()),
+                () -> verify(bookingMapper, times(0)).toDTOs(anyList()),
+                () -> assertEquals(UserExceptionEnum.USER_NOT_FOUND.getValue(), exception.getMessage())
         );
     }
 }
