@@ -11,11 +11,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-        
-      - name: Set up JDK
-        uses: actions/setup-java@v2
-        with:
-          java-version: '17'  # ou une version compatible avec votre projet
           
       - name: SonarCloud Scan
         env:
