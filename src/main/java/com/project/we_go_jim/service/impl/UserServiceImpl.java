@@ -11,11 +11,11 @@ import com.project.we_go_jim.model.UserEntity;
 import com.project.we_go_jim.repository.UserRepository;
 import com.project.we_go_jim.service.BookingService;
 import com.project.we_go_jim.service.UserService;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
