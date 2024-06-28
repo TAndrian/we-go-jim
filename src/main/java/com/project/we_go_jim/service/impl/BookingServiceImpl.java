@@ -1,6 +1,7 @@
 package com.project.we_go_jim.service.impl;
 
 import com.project.we_go_jim.dto.BookingDTO;
+import com.project.we_go_jim.dto.UserBookingHistoryDTO;
 import com.project.we_go_jim.exception.ConflictException;
 import com.project.we_go_jim.exception.NotFoundException;
 import com.project.we_go_jim.exception.enums.BookingExceptionEnum;
@@ -56,14 +57,14 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public Set<BookingDTO> getBookingsByUserId(UUID userId) {
+    public Set<UserBookingHistoryDTO> getBookingsByUserId(UUID userId) {
         if (!userRepository.existsById(userId)) {
             throw new NotFoundException(
                     UserExceptionEnum.USER_NOT_FOUND.value,
                     UserExceptionEnum.USER_EXCEPTION_CODE.value
             );
         }
-        return bookingMapper.toDTOs(bookingRepository.findByUsers_Id(userId));
+        return bookingMapper.toUserBookingHistoryDTOs(bookingRepository.findByUsers_Id(userId));
     }
 
     /**

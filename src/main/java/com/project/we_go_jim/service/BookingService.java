@@ -1,6 +1,7 @@
 package com.project.we_go_jim.service;
 
 import com.project.we_go_jim.dto.BookingDTO;
+import com.project.we_go_jim.dto.UserBookingHistoryDTO;
 import com.project.we_go_jim.model.BookingEntity;
 import com.project.we_go_jim.model.UserEntity;
 
@@ -38,5 +39,5 @@ public interface BookingService {
      * @param userId given userId.
      * @return all user's booking.
      */
-    Set<BookingDTO> getBookingsByUserId(UUID userId);
+    Set<UserBookingHistoryDTO> getBookingsByUserId(UUID userId);
 }

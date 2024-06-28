@@ -3,6 +3,7 @@ package com.project.we_go_jim.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.we_go_jim.controller.resource.BookingResourceController;
 import com.project.we_go_jim.dto.BookingDTO;
+import com.project.we_go_jim.dto.UserBookingHistoryDTO;
 import com.project.we_go_jim.exception.NotFoundException;
 import com.project.we_go_jim.service.BookingService;
 import com.project.we_go_jim.util.BookingMock;
@@ -87,7 +88,7 @@ class BookingResourceControllerUnitTest {
         final String url = "/".concat(API_BOOKINGS + "/")
                 .concat(USER + "/")
                 .concat(mockUserId.toString());
-        Set<BookingDTO> mockBookingDTOS = Set.of(BookingMock.bookingDTO());
+        Set<UserBookingHistoryDTO> mockBookingDTOS = Set.of(BookingMock.userBookingHistoryDTO());
 
         when(bookingService.getBookingsByUserId(mockUserId))
                 .thenReturn(mockBookingDTOS);
@@ -106,7 +107,7 @@ class BookingResourceControllerUnitTest {
     }
 
     @Test
-    void given_userId_when_getBookingsByUserId_then_return_empty_collections() throws Exception {
+    void given_userId_when_getUserBookingHistory_then_return_empty_collections() throws Exception {
         // ARRANGE
         UUID mockUserId = UserMock.USER_ID;
         final String url = "/".concat(API_BOOKINGS + "/")
@@ -127,7 +128,7 @@ class BookingResourceControllerUnitTest {
     }
 
     @Test
-    void given_not_found_user_when_getBookingsByUserId_then_return_throw_not_found_exception() throws Exception {
+    void given_not_found_user_when_getUserBookingHistory_then_return_throw_not_found_exception() throws Exception {
         // ARRANGE
         UUID mockNotFoundUserId = UUID.randomUUID();
 

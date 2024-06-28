@@ -135,7 +135,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/v1/user/{{userId}}/booking?startTime=2024-06-26 12:00&endTime=2024-06-26 12:30&maxParticipant=3",
+							"raw": "{{baseUrl}}/api/v1/user/{{userId}}/booking?startTime=2024-06-29T12:00&endTime=2024-06-29T12:30&maxParticipant=0",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -149,15 +149,15 @@
 							"query": [
 								{
 									"key": "startTime",
-									"value": "2024-06-26 12:00"
+									"value": "2024-06-29T12:00"
 								},
 								{
 									"key": "endTime",
-									"value": "2024-06-26 12:30"
+									"value": "2024-06-29T12:30"
 								},
 								{
 									"key": "maxParticipant",
-									"value": "3"
+									"value": "0"
 								}
 							]
 						},
@@ -195,7 +195,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"firstName\": \"John\",\r\n    \"lastName\": \"Doe\",\r\n    \"email\":\"john.does@test.com\",\r\n    \"password\": \"123456\"\r\n}",
+							"raw": "{\r\n    \"firstName\": \"Jane\",\r\n    \"lastName\": \"Doe\",\r\n    \"email\":\"jane.does@test.com\",\r\n    \"password\": \"123456\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -245,6 +245,36 @@
 								"api",
 								"v1",
 								"bookings"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getUserBookingHistory()",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/bookings/user/{{userId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"bookings",
+								"user",
+								"{{userId}}"
 							]
 						}
 					},
