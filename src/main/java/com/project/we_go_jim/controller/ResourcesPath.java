@@ -8,7 +8,10 @@ public class ResourcesPath {
     public static final String USER = "user";
 
     public static final String API_BOOKINGS = BASE_URL + BOOKINGS;
-    public static final String API_BOOKING = BASE_URL + BOOKING;
     public static final String API_USERS = BASE_URL + USERS;
     public static final String API_USER = BASE_URL + USER;
+
+    private ResourcesPath() throws IllegalAccessException {
+        throw new IllegalAccessException("Resource path exception");
+    }
 }
