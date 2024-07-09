@@ -17,7 +17,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import static com.project.we_go_jim.controller.ResourcesPath.API_BOOKINGS;
-import static com.project.we_go_jim.controller.ResourcesPath.USER;
+import static com.project.we_go_jim.controller.ResourcesPath.API_BOOKINGS_USER_BY_ID;
 
 @RestController
 @RequestMapping(
@@ -35,7 +35,7 @@ public class BookingResourceController {
         return bookingService.getBookings();
     }
 
-    @GetMapping(API_BOOKINGS + "/" + USER + "/{id}")
+    @GetMapping(API_BOOKINGS_USER_BY_ID)
     @ResponseStatus(HttpStatus.OK)
     public Set<UserBookingHistoryDTO> getUserBookingHistory(@PathVariable UUID id) {
         return bookingService.getBookingsByUserId(id);

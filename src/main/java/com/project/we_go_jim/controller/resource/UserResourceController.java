@@ -22,7 +22,7 @@ import java.util.UUID;
 
 import static com.project.we_go_jim.controller.ResourcesPath.API_USER;
 import static com.project.we_go_jim.controller.ResourcesPath.API_USERS;
-import static com.project.we_go_jim.controller.ResourcesPath.BOOKING;
+import static com.project.we_go_jim.controller.ResourcesPath.API_USER_BY_ID_BOOKINGS;
 
 @RestController
 @RequestMapping(
@@ -52,7 +52,7 @@ public class UserResourceController {
         return userService.getUserById(id);
     }
 
-    @PostMapping(API_USER + "/{id}/" + BOOKING)
+    @PostMapping(API_USER_BY_ID_BOOKINGS)
     @ResponseStatus(HttpStatus.OK)
     public UserDTO addBookingToUser(@PathVariable UUID id,
                                     @RequestParam String startTime,
@@ -61,7 +61,7 @@ public class UserResourceController {
 
         LocalDateTime bookingStartTime = LocalDateTime.parse(startTime);
         LocalDateTime bookingEndTime = LocalDateTime.parse(endTime);
-        
+
         return userService.addBookingToUser(id, bookingStartTime, bookingEndTime, maxParticipant);
     }
 }
