@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Set;
 import java.util.UUID;
 
 @Builder
@@ -22,5 +21,4 @@ public class CreateUserDTO {
     private String lastName;
     private String email;
     private String password;
-    private Set<BookingDTO> bookings;
 }
