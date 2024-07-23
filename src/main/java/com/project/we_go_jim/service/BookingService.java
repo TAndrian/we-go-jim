@@ -1,11 +1,9 @@
 package com.project.we_go_jim.service;
 
 import com.project.we_go_jim.dto.BookingDTO;
+import com.project.we_go_jim.dto.CreateBookingDTO;
 import com.project.we_go_jim.dto.UserBookingHistoryDTO;
-import com.project.we_go_jim.model.BookingEntity;
-import com.project.we_go_jim.model.UserEntity;
 
-import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
 
@@ -19,19 +17,22 @@ public interface BookingService {
     Set<BookingDTO> getBookings();
 
     /**
-     * Retrieve booking based on a given startTime, endTime and maxParticipant.
-     * If the booking does not exist, it will be created and assign it to the given user.
+     * Create booking for user.
      *
-     * @param startTime      startTIme.
-     * @param endTime        endTime.
-     * @param maxParticipant maxParticipant.
-     * @param user           existing user.
-     * @return booking to assign or which has been assigned to the given user.
+     * @param userId          target user's id.
+     * @param bookingToCreate booking event to create.
+     * @return Created booking which is assigned to the target user.
      */
-    BookingEntity getBookingByStartTimeAndEndTime(LocalDateTime startTime,
-                                                  LocalDateTime endTime,
-                                                  Integer maxParticipant,
-                                                  UserEntity user);
+    BookingDTO createOneForUser(UUID userId, CreateBookingDTO bookingToCreate);
+
+    /**
+     * Add user to an existing booking.
+     *
+     * @param bookingId target booking id.
+     * @param userId    target user to add to the booking.
+     * @return Booking where the user is added.
+     */
+    BookingDTO addBookingToUser(UUID bookingId, UUID userId);
 
     /**
      * Retrieve all user's bookings.

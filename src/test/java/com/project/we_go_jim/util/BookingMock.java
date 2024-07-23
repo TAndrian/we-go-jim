@@ -1,6 +1,7 @@
 package com.project.we_go_jim.util;
 
 import com.project.we_go_jim.dto.BookingDTO;
+import com.project.we_go_jim.dto.CreateBookingDTO;
 import com.project.we_go_jim.dto.UserBookingHistoryDTO;
 import com.project.we_go_jim.dto.UserDTO;
 import com.project.we_go_jim.model.BookingEntity;
@@ -62,6 +63,50 @@ public class BookingMock {
                 .endTime(END_TIME)
                 .maxParticipant(1)
                 .users(Set.of(UserMock.userEntity()))
+                .build();
+    }
+
+    public static CreateBookingDTO createBookingDTO() {
+        return CreateBookingDTO.builder()
+                .startTime(LocalDateTime.now())
+                .endTime(LocalDateTime.now())
+                .build();
+    }
+
+    public static CreateBookingDTO badCreateBookingDTO() {
+        return CreateBookingDTO.builder()
+                .startTime(LocalDateTime.now())
+                .endTime(null)
+                .build();
+    }
+
+    public static BookingEntity createdBookingEntity() {
+        LocalDateTime startTime = createBookingDTO().getStartTime();
+        LocalDateTime endTime = createBookingDTO().getEndTime();
+        Set<UserEntity> users = new HashSet<>();
+        users.add(UserMock.userEntity());
+
+        return BookingEntity.builder()
+                .id(UUID.randomUUID())
+                .startTime(startTime)
+                .endTime(endTime)
+                .maxParticipant(1)
+                .users(users)
+                .build();
+    }
+
+    public static BookingDTO createdBookingDTO() {
+        LocalDateTime startTime = createBookingDTO().getStartTime();
+        LocalDateTime endTime = createBookingDTO().getEndTime();
+        Set<UserDTO> users = new HashSet<>();
+        users.add(UserMock.userDTO());
+
+        return BookingDTO.builder()
+                .id(UUID.randomUUID())
+                .startTime(startTime)
+                .endTime(endTime)
+                .maxParticipant(1)
+                .users(users)
                 .build();
     }
 }
