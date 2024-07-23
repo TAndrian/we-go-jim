@@ -2,6 +2,7 @@ package com.project.we_go_jim.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.project.we_go_jim.util.TemporalBaseUtil;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -44,6 +45,8 @@ public class BookingEntity extends TemporalBaseUtil {
     private Integer maxParticipant = 0;
 
     @JsonBackReference
-    @ManyToMany(mappedBy = "bookings", fetch = FetchType.EAGER)
+    @ManyToMany(mappedBy = "bookings",
+            fetch = FetchType.EAGER,
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     private Set<UserEntity> users = new HashSet<>();
 }

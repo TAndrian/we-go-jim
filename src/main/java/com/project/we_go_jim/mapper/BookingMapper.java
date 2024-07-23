@@ -12,5 +12,7 @@ import java.util.Set;
 public interface BookingMapper {
     Set<BookingDTO> toDTOs(List<BookingEntity> bookingEntities);
 
+    BookingDTO toDTO(BookingEntity bookingEntity);
+
     Set<UserBookingHistoryDTO> toUserBookingHistoryDTOs(List<BookingEntity> bookingEntities);
 }

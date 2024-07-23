@@ -1,7 +1,9 @@
 package com.project.we_go_jim.service.impl;
 
 import com.project.we_go_jim.dto.BookingDTO;
+import com.project.we_go_jim.dto.CreateBookingDTO;
 import com.project.we_go_jim.dto.UserBookingHistoryDTO;
+import com.project.we_go_jim.exception.BadRequestException;
 import com.project.we_go_jim.exception.ConflictException;
 import com.project.we_go_jim.exception.NotFoundException;
 import com.project.we_go_jim.exception.enums.BookingExceptionEnum;
@@ -17,7 +19,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -38,55 +40,74 @@ public class BookingServiceImpl implements BookingService {
         return bookingMapper.toDTOs(bookingRepository.findAll());
     }
 
-    /**
-     * Get booking by start time and end time and assign it to the given user.
-     *
-     * @param startTime start time.
-     * @param endTime   end time.
-     * @param user      user to assign to the current booking slot.
-     * @return Booking with user assigned to the slot if it exists, create a new one and assign it to the
-     * given user otherwise.
-     */
-    public BookingEntity getBookingByStartTimeAndEndTime(LocalDateTime startTime,
-                                                         LocalDateTime endTime,
-                                                         Integer maxParticipant,
-                                                         UserEntity user) {
-        checkIfSlotIsAvailable(maxParticipant);
-        Optional<BookingEntity> booking = bookingRepository.findByStartTimeAndEndTime(startTime, endTime);
-        return booking.orElseGet(() -> createBooking(startTime, endTime, user));
-    }
-
     @Override
-    public Set<UserBookingHistoryDTO> getBookingsByUserId(UUID userId) {
-        if (!userRepository.existsById(userId)) {
-            throw new NotFoundException(
-                    UserExceptionEnum.USER_NOT_FOUND.value,
-                    UserExceptionEnum.USER_EXCEPTION_CODE.value
-            );
-        }
+    public Set<UserBookingHistoryDTO> getUserBookingHistories(UUID userId) {
+        retrieveUserById(userId);
         return bookingMapper.toUserBookingHistoryDTOs(bookingRepository.findByUsers_Id(userId));
     }
 
+    @Override
+    public BookingDTO create(UUID userId, CreateBookingDTO createBookingDTO) {
+        validateCreateBookingDTO(createBookingDTO);
+        checkIfUserHasAlreadyBookedTheSchedule(createBookingDTO, userId);
+
+        UserEntity userEntity = retrieveUserById(userId);
+        BookingEntity createdBooking = createBooking(createBookingDTO, userEntity);
+
+        // Update user's bookings.
+        Set<BookingEntity> bookings = userEntity.getBookings();
+        bookings.add(createdBooking);
+        userEntity.setBookings(bookings);
+
+        return bookingMapper.toDTO(createdBooking);
+    }
+
+    @Override
+    public BookingDTO addOneToUser(UUID bookingId, UUID userId) {
+        BookingEntity bookingEntity = retrieveBookingById(bookingId);
+        UserEntity userEntity = retrieveUserById(userId);
+
+        checkIfSlotIsAvailable(bookingEntity.getMaxParticipant());
+
+        // Update booking.
+        bookingEntity.setMaxParticipant(bookingEntity.getMaxParticipant() + 1);
+        Set<UserEntity> users = bookingEntity.getUsers();
+        users.add(userEntity);
+        bookingEntity.setUsers(users);
+        BookingEntity updatedBookingEntity = bookingRepository.saveAndFlush(bookingEntity);
+
+        // Update user.
+        Set<BookingEntity> bookings = userEntity.getBookings();
+        bookings.add(updatedBookingEntity);
+        userEntity.setBookings(bookings);
+        userRepository.saveAndFlush(userEntity);
+
+        return bookingMapper.toDTO(updatedBookingEntity);
+    }
+
+    @Override
+    public BookingDTO getById(UUID bookingId) {
+        return bookingMapper.toDTO(retrieveBookingById(bookingId));
+    }
+
     /**
-     * Create booking and assign it to the given user.
+     * Create booking.
      *
-     * @param startTime start time.
-     * @param endTime   end time.
-     * @param user      given user.
-     * @return new booking with given user assigned on it.
+     * @return new booking.
      */
-    private BookingEntity createBooking(LocalDateTime startTime, LocalDateTime endTime, UserEntity user) {
+    private BookingEntity createBooking(CreateBookingDTO bookingToCreate, UserEntity user) {
+
         BookingEntity newBooking = new BookingEntity();
-        Set<UserEntity> users = newBooking.getUsers();
-
-        newBooking.setStartTime(startTime);
-        newBooking.setEndTime(endTime);
-
-        // Update users on the current booking.
+        Set<UserEntity> users = new HashSet<>();
         users.add(user);
-        newBooking.setUsers(users);
 
-        return bookingRepository.save(newBooking);
+        newBooking.setStartTime(bookingToCreate.getStartTime());
+        newBooking.setEndTime(bookingToCreate.getEndTime());
+        newBooking.setMaxParticipant(1);
+
+
+        newBooking.setUsers(users);
+        return bookingRepository.saveAndFlush(newBooking);
     }
 
     /**
@@ -102,5 +123,66 @@ public class BookingServiceImpl implements BookingService {
                     BookingExceptionEnum.BOOKING_EXCEPTION_CODE.getValue()
             );
         }
+    }
+
+    /**
+     * Verify if the user has already booked the same schedule.
+     *
+     * @param createBookingDTO booking to create.
+     * @param userId           given userId.
+     */
+    private void checkIfUserHasAlreadyBookedTheSchedule(CreateBookingDTO createBookingDTO, UUID userId) {
+        Optional<BookingEntity> existingBooking = bookingRepository.findByStartTimeAndEndTimeAndUsers_Id(
+                createBookingDTO.getStartTime(),
+                createBookingDTO.getEndTime(),
+                userId);
+        if (existingBooking.isPresent()) {
+            throw new ConflictException(
+                    BookingExceptionEnum.BOOKING_ALREADY_BOOKED_FOR_CURRENT_USER.getValue(),
+                    BookingExceptionEnum.BOOKING_EXCEPTION_CODE.getValue()
+            );
+        }
+    }
+
+    /**
+     * Check if the booking to create is badly defined.
+     *
+     * @param createBookingDTO booking to create.
+     */
+    private void validateCreateBookingDTO(CreateBookingDTO createBookingDTO) {
+        if (createBookingDTO.getEndTime() == null ||
+                createBookingDTO.getStartTime() == null) {
+            throw new BadRequestException(
+                    BookingExceptionEnum.CREATE_BOOKING_BAD_REQUEST.value,
+                    BookingExceptionEnum.BOOKING_EXCEPTION_CODE.getValue()
+            );
+        }
+    }
+
+    /**
+     * Find user by userId.
+     *
+     * @param userId given userId.
+     * @return user entity if it is present.
+     */
+    private UserEntity retrieveUserById(UUID userId) {
+        return userRepository.findById(userId).orElseThrow(() -> {
+                    log.info("User not found with id:{}", userId);
+                    return new NotFoundException(
+                            UserExceptionEnum.USER_NOT_FOUND.getValue(),
+                            UserExceptionEnum.USER_EXCEPTION_CODE.value
+                    );
+                }
+        );
+    }
+
+    private BookingEntity retrieveBookingById(UUID bookingId) {
+        return bookingRepository.findById(bookingId).orElseThrow(() -> {
+            log.info("booking not found with id:{}", bookingId);
+            return new NotFoundException(
+                    BookingExceptionEnum.BOOKING_NOT_FOUND.getValue(),
+                    BookingExceptionEnum.BOOKING_EXCEPTION_CODE.getValue()
+            );
+        });
     }
 }

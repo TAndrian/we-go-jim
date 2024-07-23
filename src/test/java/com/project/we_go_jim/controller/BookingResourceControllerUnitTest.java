@@ -90,7 +90,7 @@ class BookingResourceControllerUnitTest {
                 .concat(mockUserId.toString());
         Set<UserBookingHistoryDTO> mockBookingDTOS = Set.of(BookingMock.userBookingHistoryDTO());
 
-        when(bookingService.getBookingsByUserId(mockUserId))
+        when(bookingService.getUserBookingHistories(mockUserId))
                 .thenReturn(mockBookingDTOS);
 
         String expectedResponseBody = objectMapper.writeValueAsString(mockBookingDTOS);
@@ -103,7 +103,7 @@ class BookingResourceControllerUnitTest {
                 .andExpect(content().json(expectedResponseBody));
 
         // ASSERT
-        verify(bookingService, times(1)).getBookingsByUserId(any());
+        verify(bookingService, times(1)).getUserBookingHistories(any());
     }
 
     @Test
@@ -124,7 +124,7 @@ class BookingResourceControllerUnitTest {
                 .andExpect(content().json(expectedResponseBody));
 
         // ASSERT
-        verify(bookingService, times(1)).getBookingsByUserId(any());
+        verify(bookingService, times(1)).getUserBookingHistories(any());
     }
 
     @Test
@@ -136,7 +136,7 @@ class BookingResourceControllerUnitTest {
                 .concat(USER + "/")
                 .concat(mockNotFoundUserId.toString());
 
-        when(bookingService.getBookingsByUserId(mockNotFoundUserId))
+        when(bookingService.getUserBookingHistories(mockNotFoundUserId))
                 .thenThrow(NotFoundException.class);
 
         // ACT
@@ -146,6 +146,6 @@ class BookingResourceControllerUnitTest {
                 .andExpect(status().isNotFound());
 
         // ASSERT
-        verify(bookingService, times(1)).getBookingsByUserId(any());
+        verify(bookingService, times(1)).getUserBookingHistories(any());
     }
 }
