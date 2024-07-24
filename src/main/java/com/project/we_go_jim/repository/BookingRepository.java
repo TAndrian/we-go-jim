@@ -9,8 +9,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface BookingRepository extends JpaRepository<BookingEntity, UUID> {
-    Optional<BookingEntity> findByStartTimeAndEndTime(LocalDateTime startTime, LocalDateTime endTime);
-
     List<BookingEntity> findByUsers_Id(UUID id);
 
+    Optional<BookingEntity> findByStartTimeAndEndTimeAndUsers_Id(LocalDateTime startTime,
+                                                                 LocalDateTime endTime,
+                                                                 UUID id);
 }

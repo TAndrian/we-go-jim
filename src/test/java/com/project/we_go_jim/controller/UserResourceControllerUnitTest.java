@@ -5,10 +5,8 @@ import com.project.we_go_jim.controller.resource.UserResourceController;
 import com.project.we_go_jim.dto.CreateUserDTO;
 import com.project.we_go_jim.dto.UserDTO;
 import com.project.we_go_jim.exception.BadRequestException;
-import com.project.we_go_jim.exception.ConflictException;
 import com.project.we_go_jim.exception.NotFoundException;
 import com.project.we_go_jim.service.UserService;
-import com.project.we_go_jim.util.BookingMock;
 import com.project.we_go_jim.util.UserMock;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,13 +17,11 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
 import static com.project.we_go_jim.controller.ResourcesPath.API_USER;
 import static com.project.we_go_jim.controller.ResourcesPath.API_USERS;
-import static com.project.we_go_jim.controller.ResourcesPath.BOOKING;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
@@ -165,64 +161,5 @@ class UserResourceControllerUnitTest {
 
         // ASSERT
         verify(userService, times(1)).createUser(any());
-    }
-
-    @Test
-    void given_full_schedule_when_addBookingToUser_then_return_error_conflict() throws Exception {
-        // ARRANGE
-        UUID mockUserId = UserMock.USER_ID;
-        LocalDateTime mockStartTime = BookingMock.START_TIME;
-        LocalDateTime mockEndTime = BookingMock.END_TIME;
-        Integer maxParticipant = BookingMock.MAX_PARTICIPANT;
-
-        when(userService.addBookingToUser(mockUserId, mockStartTime, mockEndTime, maxParticipant))
-                .thenThrow(ConflictException.class);
-
-        final String url = "/".concat(API_USER)
-                .concat("/" + mockUserId + "/")
-                .concat(BOOKING);
-
-        // ACT
-        mockMvc.perform(post(url)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .param("startTime", mockStartTime.toString())
-                        .param("endTime", mockEndTime.toString())
-                        .param("maxParticipant", String.valueOf(maxParticipant)))
-                .andExpect(status().isConflict());
-
-        // ASSERT
-        verify(userService, times(1)).addBookingToUser(any(), any(), any(), any());
-    }
-
-    @Test
-    void given_available_schedule_when_addBookingToUser_then_assign_schedule_to_user() throws Exception {
-        // ARRANGE
-        UUID mockUserId = UserMock.USER_ID;
-        LocalDateTime mockStartTime = BookingMock.START_TIME;
-        LocalDateTime mockEndTime = BookingMock.END_TIME;
-        UserDTO mockUserAssignedToBookingDTO = UserMock.userAssignedToBookingDTO();
-
-        when(userService.addBookingToUser(mockUserId, mockStartTime, mockEndTime, 0))
-                .thenReturn(mockUserAssignedToBookingDTO);
-
-        String responseBody = objectMapper.writeValueAsString(mockUserAssignedToBookingDTO);
-
-        final String url = "/".concat(API_USER)
-                .concat("/" + mockUserId + "/")
-                .concat(BOOKING);
-
-        // ACT
-        mockMvc.perform(post(url)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .param("startTime", mockStartTime.toString())
-                        .param("endTime", mockEndTime.toString())
-                        .param("maxParticipant", String.valueOf(0)))
-                .andExpect(status().isOk())
-                .andExpect(content().json(responseBody));
-
-        // ASSERT
-        verify(userService, times(1)).addBookingToUser(any(), any(), any(), any());
     }
 }

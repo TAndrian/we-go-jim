@@ -1,13 +1,16 @@
 package com.project.we_go_jim;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.we_go_jim.dto.BookingDTO;
+import com.project.we_go_jim.dto.CreateBookingDTO;
 import com.project.we_go_jim.dto.UserBookingHistoryDTO;
 import com.project.we_go_jim.dto.UserDTO;
 import com.project.we_go_jim.mapper.BookingMapper;
 import com.project.we_go_jim.mapper.UserMapper;
-import com.project.we_go_jim.model.BookingEntity;
 import com.project.we_go_jim.repository.BookingRepository;
 import com.project.we_go_jim.repository.UserRepository;
+import com.project.we_go_jim.util.BookingMock;
+import com.project.we_go_jim.util.DateUtils;
 import com.project.we_go_jim.util.DbCommonOperation;
 import com.project.we_go_jim.util.UserMock;
 import jakarta.persistence.EntityNotFoundException;
@@ -27,16 +30,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.client.RestTemplate;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
+import static com.project.we_go_jim.controller.ResourcesPath.API_BOOKING;
 import static com.project.we_go_jim.controller.ResourcesPath.API_BOOKINGS;
 import static com.project.we_go_jim.controller.ResourcesPath.API_USER;
 import static com.project.we_go_jim.controller.ResourcesPath.API_USERS;
-import static com.project.we_go_jim.controller.ResourcesPath.BOOKING;
 import static com.project.we_go_jim.controller.ResourcesPath.USER;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -47,6 +49,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ActiveProfiles("test")
 class WeGoJimApplicationTests {
 
+    public static final UUID JOHN_ID = UserMock.JOHN_ID;
+    public static final UUID BOOKING_ID = UUID.fromString("3fa0e077-690e-4847-89b5-b3881534af3f");
     @LocalServerPort
     private int port;
 
@@ -64,6 +68,9 @@ class WeGoJimApplicationTests {
     private UserMapper userMapper;
     @Autowired
     private BookingMapper bookingMapper;
+
+    @Autowired
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Autowired
     private DbCommonOperation dbCommonOperation;
@@ -129,12 +136,11 @@ class WeGoJimApplicationTests {
     @Test
     void should_get_user_by_id() {
         // ARRANGE
-        UUID userId = UserMock.JOHN_ID;
         baseUrl = baseUrl.concat(":")
                 .concat(port + "/")
                 .concat(API_USER)
                 .concat("/")
-                .concat(userId.toString());
+                .concat(JOHN_ID.toString());
 
         // ACT
         HttpEntity<UserDTO> entity = new HttpEntity<>(headers);
@@ -143,7 +149,7 @@ class WeGoJimApplicationTests {
 
         UserDTO expectedUser = response.getBody();
         UserDTO userDTO = userMapper.toDTO(
-                userRepository.findById(userId)
+                userRepository.findById(JOHN_ID)
                         .orElseThrow(() -> new EntityNotFoundException("UserNotFound")));
 
         // ASSERT
@@ -154,48 +160,13 @@ class WeGoJimApplicationTests {
     }
 
     @Test
-    void should_add_booking_to_user() {
-        // ARRANGE
-        UUID userId = UserMock.JOHN_ID;
-        UUID bookingId = UUID.fromString("3fa0e077-690e-4847-89b5-b3881534af3f");
-        LocalDateTime startTime = LocalDateTime.parse("2024-06-22T14:00:00");
-        LocalDateTime endTime = LocalDateTime.parse("2024-06-22T14:30:00");
-        Integer maxParticipant = 5;
-
-        baseUrl = baseUrl.concat(":")
-                .concat(port + "/")
-                .concat(API_USER + "/")
-                .concat(userId.toString().concat("/"))
-                .concat(BOOKING.concat("?"))
-                .concat("startTime=" + startTime.toString().concat("&"))
-                .concat("endTime=".concat(endTime.toString()).concat("&"))
-                .concat("maxParticipant=".concat(String.valueOf(maxParticipant)));
-
-        // ACT
-        HttpEntity<UserDTO> entity = new HttpEntity<>(headers);
-        ResponseEntity<UserDTO> response =
-                restTemplate.postForEntity(baseUrl, entity, UserDTO.class);
-
-        BookingEntity booking = bookingRepository.findById(bookingId).orElseThrow();
-        boolean match = booking.getUsers().stream().anyMatch(user -> user.getId().equals(userId));
-
-        // ASSERT
-        assertAll(
-                () -> assertEquals(HttpStatus.OK, response.getStatusCode()),
-                () -> assertEquals(2, booking.getUsers().size()),
-                () -> assertTrue(match)
-        );
-    }
-
-    @Test
     void should_get_bookings_by_user_id() {
         // ARRANGE
-        UUID userId = UserMock.JOHN_ID;
 
         baseUrl = baseUrl.concat(":")
                 .concat(port + "/")
                 .concat(API_BOOKINGS + "/")
-                .concat(USER + "/" + userId);
+                .concat(USER + "/" + JOHN_ID);
 
         // ACT
         HttpEntity<UserBookingHistoryDTO[]> entity = new HttpEntity<>(headers);
@@ -204,13 +175,106 @@ class WeGoJimApplicationTests {
 
         Set<UserBookingHistoryDTO> responseBody = Set.of(Objects.requireNonNull(response.getBody()));
         Set<UserBookingHistoryDTO> userBookingHistoryDTOs =
-                bookingMapper.toUserBookingHistoryDTOs(bookingRepository.findByUsers_Id(userId));
+                bookingMapper.toUserBookingHistoryDTOs(bookingRepository.findByUsers_Id(JOHN_ID));
 
         // ASSERT
         assertAll(
                 () -> assertEquals(HttpStatus.OK, response.getStatusCode()),
                 () -> assertThat(userBookingHistoryDTOs)
                         .isEqualTo(responseBody)
+        );
+    }
+
+    @Test
+    void should_get_booking_by_bookingId() {
+        // ARRANGE
+
+        baseUrl = baseUrl.concat(":")
+                .concat(port + "/")
+                .concat(API_BOOKING + "/")
+                .concat(BOOKING_ID.toString());
+
+        // ACT
+        HttpEntity<BookingDTO> entity = new HttpEntity<>(headers);
+        ResponseEntity<BookingDTO> response =
+                restTemplate.exchange(baseUrl, HttpMethod.GET, entity, BookingDTO.class);
+
+        BookingDTO bookingDTO = bookingMapper.toDTO(bookingRepository.findById(BOOKING_ID).orElseThrow());
+        BookingDTO expected = response.getBody();
+
+        // ASSERT
+        assertAll(
+                () -> assertEquals(HttpStatus.OK, response.getStatusCode()),
+                () -> assertThat(bookingDTO)
+                        .isEqualTo(expected)
+        );
+    }
+
+    @Test
+    void should_create_booking_for_user() {
+        // ARRANGE
+
+        baseUrl = baseUrl.concat(":")
+                .concat(port + "/")
+                .concat(API_BOOKING + "/")
+                .concat(USER + "/" + JOHN_ID);
+
+        CreateBookingDTO createBookingDTO = BookingMock.createBookingDTO();
+
+        // ACT
+        ResponseEntity<BookingDTO> response =
+                restTemplate.postForEntity(baseUrl, createBookingDTO, BookingDTO.class);
+
+        BookingDTO expected = response.getBody();
+        assert expected != null;
+        BookingDTO bookingDTO = bookingMapper.toDTO(bookingRepository.findById(expected.getId()).orElseThrow());
+
+        bookingDTO.setStartTime(DateUtils.formatDate(bookingDTO.getStartTime()));
+        bookingDTO.setEndTime(DateUtils.formatDate(bookingDTO.getEndTime()));
+
+        expected.setStartTime(DateUtils.formatDate(expected.getStartTime()));
+        expected.setEndTime(DateUtils.formatDate(expected.getEndTime()));
+
+        // ASSERT
+        assertAll(
+                () -> assertEquals(HttpStatus.CREATED, response.getStatusCode()),
+                () -> assertThat(bookingDTO).isEqualTo(expected)
+        );
+    }
+
+    @Test
+    void should_add_user_to_booking() {
+        // ARRANGE
+
+        baseUrl = baseUrl.concat(":")
+                .concat(port + "/")
+                .concat(API_BOOKING + "/" + BOOKING_ID + "/")
+                .concat(USER + "/" + JOHN_ID);
+
+        // ACT
+        HttpEntity<BookingDTO> entity = new HttpEntity<>(headers);
+        ResponseEntity<BookingDTO> response =
+                restTemplate.postForEntity(baseUrl, entity, BookingDTO.class);
+
+        BookingDTO expected = response.getBody();
+        BookingDTO bookingDTO = bookingMapper.toDTO(bookingRepository.findById(BOOKING_ID).orElseThrow());
+        UserDTO userDTO = userMapper.toDTO(userRepository.findById(JOHN_ID).orElseThrow());
+
+        // Format date.
+        bookingDTO.setStartTime(DateUtils.formatDate(bookingDTO.getStartTime()));
+        bookingDTO.setEndTime(DateUtils.formatDate(bookingDTO.getEndTime()));
+
+        assert expected != null;
+        expected.setStartTime(DateUtils.formatDate(expected.getStartTime()));
+        expected.setEndTime(DateUtils.formatDate(expected.getEndTime()));
+
+        Set<UserDTO> expectedUsers = expected.getUsers();
+
+        // ASSERT
+        assertAll(
+                () -> assertEquals(HttpStatus.OK, response.getStatusCode()),
+                () -> assertThat(bookingDTO).isEqualTo(expected),
+                () -> assertTrue(expectedUsers.contains(userDTO))
         );
     }
 }
