@@ -43,8 +43,8 @@ public class BookingResourceController {
 
     @GetMapping(API_BOOKINGS_USER_BY_ID)
     @ResponseStatus(HttpStatus.OK)
-    public Set<UserBookingHistoryDTO> getUserBookingHistory(@PathVariable UUID id) {
-        return bookingService.getUserBookingHistories(id);
+    public Set<UserBookingHistoryDTO> getUserBookingHistory(@PathVariable UUID userId) {
+        return bookingService.getUserBookingHistories(userId);
     }
 
     @GetMapping(API_BOOKING_BY_ID)

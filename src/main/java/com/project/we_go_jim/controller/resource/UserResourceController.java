@@ -46,7 +46,7 @@ public class UserResourceController {
 
     @GetMapping(API_USER_BY_ID)
     @ResponseStatus(HttpStatus.OK)
-    public UserDTO getUserById(@PathVariable UUID id) {
-        return userService.getUserById(id);
+    public UserDTO getUserById(@PathVariable UUID userId) {
+        return userService.getUserById(userId);
     }
 }

@@ -19,6 +19,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -48,10 +49,18 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingDTO create(UUID userId, CreateBookingDTO createBookingDTO) {
+
+        // Verify booking's validity.
         validateCreateBookingDTO(createBookingDTO);
-        checkIfUserHasAlreadyBookedTheSchedule(createBookingDTO, userId);
+        checkIfUserHasAlreadyBookedTheSchedule(
+                createBookingDTO.getStartTime(),
+                createBookingDTO.getEndTime(),
+                userId
+        );
 
         UserEntity userEntity = retrieveUserById(userId);
+
+        // Create booking for user.
         BookingEntity createdBooking = createBooking(createBookingDTO, userEntity);
 
         // Update user's bookings.
@@ -67,16 +76,22 @@ public class BookingServiceImpl implements BookingService {
         BookingEntity bookingEntity = retrieveBookingById(bookingId);
         UserEntity userEntity = retrieveUserById(userId);
 
+        // Verify booking's validity.
+        checkIfUserHasAlreadyBookedTheSchedule(
+                bookingEntity.getStartTime(),
+                bookingEntity.getEndTime(),
+                userId
+        );
         checkIfSlotIsAvailable(bookingEntity.getMaxParticipant());
 
-        // Update booking.
+        // Update booking for user.
         bookingEntity.setMaxParticipant(bookingEntity.getMaxParticipant() + 1);
         Set<UserEntity> users = bookingEntity.getUsers();
         users.add(userEntity);
         bookingEntity.setUsers(users);
         BookingEntity updatedBookingEntity = bookingRepository.saveAndFlush(bookingEntity);
 
-        // Update user.
+        // Update user's bookings.
         Set<BookingEntity> bookings = userEntity.getBookings();
         bookings.add(updatedBookingEntity);
         userEntity.setBookings(bookings);
@@ -128,13 +143,16 @@ public class BookingServiceImpl implements BookingService {
     /**
      * Verify if the user has already booked the same schedule.
      *
-     * @param createBookingDTO booking to create.
-     * @param userId           given userId.
+     * @param startTime booking start time.
+     * @param endTime   booking end time.
+     * @param userId    user's id.
      */
-    private void checkIfUserHasAlreadyBookedTheSchedule(CreateBookingDTO createBookingDTO, UUID userId) {
+    private void checkIfUserHasAlreadyBookedTheSchedule(LocalDateTime startTime,
+                                                        LocalDateTime endTime,
+                                                        UUID userId) {
         Optional<BookingEntity> existingBooking = bookingRepository.findByStartTimeAndEndTimeAndUsers_Id(
-                createBookingDTO.getStartTime(),
-                createBookingDTO.getEndTime(),
+                startTime,
+                endTime,
                 userId);
         if (existingBooking.isPresent()) {
             throw new ConflictException(
