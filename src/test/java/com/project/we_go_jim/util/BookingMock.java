@@ -87,4 +87,30 @@ public class BookingMock {
                 .users(users)
                 .build();
     }
+
+    public static BookingEntity userAddedOnBookingEntity() {
+        Set<UserEntity> users = bookingEntity().getUsers();
+        users.add(UserMock.janeSmithEntity());
+
+        return BookingEntity.builder()
+                .id(bookingEntity().getId())
+                .startTime(bookingEntity().getStartTime())
+                .endTime(bookingEntity().getEndTime())
+                .maxParticipant(bookingEntity().getMaxParticipant() + 1)
+                .users(users)
+                .build();
+    }
+
+    public static BookingDTO userAddedOnBookingDTO() {
+        Set<UserDTO> users = bookingDTO().getUsers();
+        users.add(UserMock.janeSmithDTO());
+
+        return BookingDTO.builder()
+                .id(bookingEntity().getId())
+                .startTime(bookingDTO().getStartTime())
+                .endTime(bookingDTO().getEndTime())
+                .maxParticipant(userAddedOnBookingEntity().getMaxParticipant())
+                .users(users)
+                .build();
+    }
 }

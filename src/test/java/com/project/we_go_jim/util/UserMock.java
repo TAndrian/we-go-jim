@@ -21,6 +21,25 @@ public class UserMock {
                 .build();
     }
 
+    public static UserEntity janeSmithEntity() {
+        return UserEntity.builder()
+                .id(UUID.randomUUID())
+                .firstName("Jane")
+                .lastName("Smith")
+                .email("jane.smith@test.com")
+                .bookings(new HashSet<>())
+                .build();
+    }
+
+    public static UserDTO janeSmithDTO() {
+        return UserDTO.builder()
+                .id(UUID.randomUUID())
+                .firstName("Jane")
+                .lastName("Smith")
+                .email("jane.smith@test.com")
+                .build();
+    }
+
     public static UserDTO userDTO() {
         return UserDTO.builder()
                 .id(USER_ID)

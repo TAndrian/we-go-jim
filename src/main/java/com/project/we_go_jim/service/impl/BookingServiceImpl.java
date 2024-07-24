@@ -74,7 +74,6 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public BookingDTO addOneToUser(UUID bookingId, UUID userId) {
         BookingEntity bookingEntity = retrieveBookingById(bookingId);
-        UserEntity userEntity = retrieveUserById(userId);
 
         // Verify booking's validity.
         checkIfUserHasAlreadyBookedTheSchedule(
@@ -83,6 +82,8 @@ public class BookingServiceImpl implements BookingService {
                 userId
         );
         checkIfSlotIsAvailable(bookingEntity.getMaxParticipant());
+
+        UserEntity userEntity = retrieveUserById(userId);
 
         // Update booking for user.
         bookingEntity.setMaxParticipant(bookingEntity.getMaxParticipant() + 1);

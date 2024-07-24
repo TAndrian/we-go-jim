@@ -346,27 +346,150 @@ class BookingServiceUnitTest {
     @Test
     void given_bookingId_and_userId_when_addOneToUser_then_add_user_to_booking() {
         // ARRANGE
+        BookingEntity mockUserAddedOnBookingEntity = BookingMock.userAddedOnBookingEntity();
+        BookingDTO mockUserAddedOnBookingDTO = BookingMock.userAddedOnBookingDTO();
+
+        when(bookingRepository.findById(MOCK_BOOKING_ID))
+                .thenReturn(Optional.ofNullable(MOCK_BOOKING_ENTITY));
+        when(userRepository.findById(MOCK_USER_ID))
+                .thenReturn(Optional.ofNullable(MOCKER_USER_ENTITY));
+        when(bookingRepository.saveAndFlush(any()))
+                .thenReturn(mockUserAddedOnBookingEntity);
+        when(bookingMapper.toDTO(mockUserAddedOnBookingEntity))
+                .thenReturn(mockUserAddedOnBookingDTO);
 
         // ACT
+        BookingDTO expected = bookingService.addOneToUser(MOCK_BOOKING_ID, MOCK_USER_ID);
 
         // ASSERT
+        assertAll(
+                () -> verify(bookingRepository, times(1)).findById(any()),
+                () -> verify(bookingRepository, times(1)).findByStartTimeAndEndTimeAndUsers_Id(
+                        any(),
+                        any(),
+                        any()
+                ),
+                () -> verify(userRepository, times(1)).findById(any()),
+                () -> verify(bookingRepository, times(1)).saveAndFlush(any()),
+                () -> verify(bookingMapper, times(1)).toDTO(any()),
+                () -> assertEquals(mockUserAddedOnBookingDTO, expected)
+        );
     }
 
     @Test
-    void given_not_found_ids_when_addOneToUser_then_return_notFound_error() {
-        // ARRANGE
+    void given_not_found_bookingIds_when_addOneToUser_then_return_notFound_error() {
 
         // ACT
+        NotFoundException bookingException = assertThrows(
+                NotFoundException.class,
+                () -> bookingService.addOneToUser(MOCK_NOT_FOUND_BOOKING_ID, MOCK_NOT_FOUND_USER_ID)
+        );
 
         // ASSERT
+        assertAll(
+                () -> verify(bookingRepository, times(1)).findById(any()),
+                () -> verify(bookingRepository, times(0)).findByStartTimeAndEndTimeAndUsers_Id(
+                        any(),
+                        any(),
+                        any()
+                ),
+                () -> verify(userRepository, times(0)).findById(any()),
+                () -> verify(bookingRepository, times(0)).saveAndFlush(any()),
+                () -> verify(bookingMapper, times(0)).toDTO(any()),
+                () -> assertEquals(BookingExceptionEnum.BOOKING_NOT_FOUND.getValue(),
+                        bookingException.getMessage())
+        );
     }
 
     @Test
-    void given_bookingId_and_userId_and_unavailable_slot_when_addOneToUser_then_add_user_to_booking() {
+    void given_not_found_userId_when_addOneToUser_then_return_notFound_error() {
         // ARRANGE
+        when(bookingRepository.findById(MOCK_BOOKING_ID))
+                .thenReturn(Optional.ofNullable(MOCK_BOOKING_ENTITY));
 
         // ACT
+        NotFoundException userException = assertThrows(
+                NotFoundException.class,
+                () -> bookingService.addOneToUser(MOCK_BOOKING_ID, MOCK_NOT_FOUND_USER_ID)
+        );
 
         // ASSERT
+        assertAll(
+                () -> verify(bookingRepository, times(1)).findById(any()),
+                () -> verify(bookingRepository, times(1)).findByStartTimeAndEndTimeAndUsers_Id(
+                        any(),
+                        any(),
+                        any()
+                ),
+                () -> verify(userRepository, times(1)).findById(any()),
+                () -> verify(bookingRepository, times(0)).saveAndFlush(any()),
+                () -> verify(bookingMapper, times(0)).toDTO(any()),
+                () -> assertEquals(UserExceptionEnum.USER_NOT_FOUND.getValue(),
+                        userException.getMessage())
+        );
+    }
+
+    @Test
+    void given_bookingId_and_userId_and_already_booked_slot_when_addOneToUser_then_return_conflict_error() {
+        // ARRANGE
+        when(bookingRepository.findById(MOCK_BOOKING_ID))
+                .thenReturn(Optional.ofNullable(MOCK_BOOKING_ENTITY));
+        assert MOCK_BOOKING_ENTITY != null;
+        when(bookingRepository.findByStartTimeAndEndTimeAndUsers_Id(
+                MOCK_BOOKING_ENTITY.getStartTime(),
+                MOCK_BOOKING_ENTITY.getEndTime(),
+                MOCK_USER_ID
+        )).thenReturn(Optional.of(MOCK_BOOKING_ENTITY));
+
+        // ACT
+        ConflictException exception = assertThrows(
+                ConflictException.class,
+                () -> bookingService.addOneToUser(MOCK_BOOKING_ID, MOCK_USER_ID)
+        );
+
+        // ASSERT
+        assertAll(
+                () -> verify(bookingRepository, times(1)).findById(any()),
+                () -> verify(bookingRepository, times(1)).findByStartTimeAndEndTimeAndUsers_Id(
+                        any(),
+                        any(),
+                        any()
+                ),
+                () -> verify(userRepository, times(0)).findById(any()),
+                () -> verify(bookingRepository, times(0)).saveAndFlush(any()),
+                () -> verify(bookingMapper, times(0)).toDTO(any()),
+                () -> assertEquals(BookingExceptionEnum.BOOKING_ALREADY_BOOKED_FOR_CURRENT_USER.getValue(),
+                        exception.getMessage())
+        );
+    }
+
+    @Test
+    void given_bookingId_and_userId_and_unavailable_slot_when_addOneToUser_then_return_conflict_error() {
+        // ARRANGE
+        BookingEntity mockBookingEntity = BookingEntity.builder()
+                .maxParticipant(10)
+                .build();
+        when(bookingRepository.findById(MOCK_BOOKING_ID))
+                .thenReturn(Optional.of(mockBookingEntity));
+        // ACT
+        ConflictException exception = assertThrows(
+                ConflictException.class,
+                () -> bookingService.addOneToUser(MOCK_BOOKING_ID, MOCK_USER_ID)
+        );
+
+        // ASSERT
+        assertAll(
+                () -> verify(bookingRepository, times(1)).findById(any()),
+                () -> verify(bookingRepository, times(1)).findByStartTimeAndEndTimeAndUsers_Id(
+                        any(),
+                        any(),
+                        any()
+                ),
+                () -> verify(userRepository, times(0)).findById(any()),
+                () -> verify(bookingRepository, times(0)).saveAndFlush(any()),
+                () -> verify(bookingMapper, times(0)).toDTO(any()),
+                () -> assertEquals(BookingExceptionEnum.BOOKING_MAX_PARTICIPANT_OVER_TEN.getValue(),
+                        exception.getMessage())
+        );
     }
 }

@@ -296,4 +296,88 @@ class BookingResourceControllerUnitTest {
         // ASSERT
         verify(bookingService, times(1)).create(any(), any());
     }
+
+    @Test
+    void given_bookingId_and_userId_when_addOneToUser_then_add_user_to_booking() throws Exception {
+        // ARRANGE
+        BookingDTO mockBookingDTO = BookingMock.userAddedOnBookingDTO();
+        final String url = "/"
+                .concat(API_BOOKING + "/" + MOCK_BOOKING_ID + "/")
+                .concat(USER + "/" + MOCK_USER_ID);
+
+        when(bookingService.addOneToUser(MOCK_BOOKING_ID, MOCK_USER_ID))
+                .thenReturn(mockBookingDTO);
+
+        String expectedResponseBody = objectMapper.writeValueAsString(mockBookingDTO);
+
+        // ACT
+        mockMvc.perform(post(url)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json(expectedResponseBody));
+
+        // ASSERT
+        verify(bookingService, times(1)).addOneToUser(any(), any());
+    }
+
+    @Test
+    void given_not_found_bookingId_when_addOneToUser_then_return_notFound_error() throws Exception {
+        // ARRANGE
+        final String url = "/"
+                .concat(API_BOOKING + "/" + MOCK_NOT_FOUND_BOOKING_ID + "/")
+                .concat(USER + "/" + MOCK_USER_ID);
+
+        when(bookingService.addOneToUser(MOCK_NOT_FOUND_BOOKING_ID, MOCK_USER_ID))
+                .thenThrow(NotFoundException.class);
+
+        // ACT
+        mockMvc.perform(post(url)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+
+        // ASSERT
+        verify(bookingService, times(1)).addOneToUser(any(), any());
+    }
+
+    @Test
+    void given_not_found_userId_when_addOneToUser_then_return_notFound_error() throws Exception {
+        // ARRANGE
+        final String url = "/"
+                .concat(API_BOOKING + "/" + MOCK_BOOKING_ID + "/")
+                .concat(USER + "/" + MOCK_NOT_FOUND_USER_ID);
+
+        when(bookingService.addOneToUser(MOCK_BOOKING_ID, MOCK_NOT_FOUND_USER_ID))
+                .thenThrow(NotFoundException.class);
+
+        // ACT
+        mockMvc.perform(post(url)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+
+        // ASSERT
+        verify(bookingService, times(1)).addOneToUser(any(), any());
+    }
+
+    @Test
+    void given_bookingId_and_userId_when_addOneToUser_then_return_conflict_error() throws Exception {
+        // ARRANGE
+        final String url = "/"
+                .concat(API_BOOKING + "/" + MOCK_BOOKING_ID + "/")
+                .concat(USER + "/" + MOCK_USER_ID);
+
+        when(bookingService.addOneToUser(MOCK_BOOKING_ID, MOCK_USER_ID))
+                .thenThrow(ConflictException.class);
+
+        // ACT
+        mockMvc.perform(post(url)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isConflict());
+
+        // ASSERT
+        verify(bookingService, times(1)).addOneToUser(any(), any());
+    }
 }
