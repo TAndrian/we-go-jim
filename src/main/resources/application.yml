@@ -3,33 +3,41 @@ spring:
     host: ${REDIS_HOST:localhost}
     port: ${REDIS_PORT:6379}
     timeout: ${REDIS_TIMEOUT:2000}
+
   mail:
     host: ${MAIL_HOST:smtp.gmail.com}
     port: ${MAIL_PORT:587}
-    username: ${MAIL_USERNAME}
-    password: ${MAIL_PASSWORD}
+    username: ${MAIL_USERNAME:usermail}
+    password: ${MAIL_PASSWORD:password}
     properties:
       mail:
         smtp:
           auth: ${MAIL_SMTP_AUTH:true}
           starttls:
             enable: ${MAIL_STARTTLS_ENABLE:true}
+
   application:
     name: ${APP_NAME:we-go-jim}
     security:
       jwt:
-        secret-key: ${JWT_SECRET_KEY}
+        secret-key: ${JWT_SECRET_KEY:82bdf813fb5c74a4de994760c094c8fd607478b146364eb1dba733124b91cd8363c9ba36229621f84b3cb82826b773f662d1e81b3afa99f86e8d99bd742c025ff760b497b6622ac6e5d8ef2fb0a11f969a6eb08b908269046394170a7e7d7acbbf89ec48a6a37d845faf21a643dcf55d0effd1733fef73e6bb96dcdb360a1414f2f72dde487b09daebba51328cb523cf0c48421c3235050cb407ace32c2e9c6245c0e53dedab4ff13224a24d0bfad3d1b32fe8a387f0ede9fea93c51c1f4f475351b0d89dd3bf2e6414896f870b140c7b139379a5ffc592973c93e7ef8d59dff2f6eb7e7f70176a86e0dd432f9dba4a15f11e018a05245088b0b4e1c684e4377}
+        expiration: ${JWT_EXPIRATION:86400000}
+        refresh-token:
+          expiration: ${JWT_REFRESH_TOKEN_EXPIRATION:604800000}
+
   log4j:
     logger:
       org:
         hibernate:
           type: ${LOG4J_HIBERNATE_TYPE:TRACE}
           SQL: ${LOG4J_SQL:DEBUG}
+
   datasource:
-    url: ${DATASOURCE_URL}
-    username: ${DATASOURCE_USERNAME}
-    password: ${DATASOURCE_PASSWORD}
+    url: ${DATASOURCE_URL:jdbc:postgresql://localhost:5433/gym}
+    username: ${DATASOURCE_USERNAME:postgres}
+    password: ${DATASOURCE_PASSWORD:123456}
     driver-class-name: ${DATASOURCE_DRIVER_CLASS_NAME:org.postgresql.Driver}
+
   jpa:
     hibernate:
       ddl-auto: ${JPA_HIBERNATE_DDL_AUTO:update}
@@ -38,6 +46,7 @@ spring:
       hibernate:
         format_sql: ${JPA_HIBERNATE_FORMAT_SQL:true}
         dialect: ${JPA_HIBERNATE_DIALECT:org.hibernate.dialect.PostgreSQLDialect}
+
   liquibase:
     enabled: ${LIQUIBASE_ENABLED:true}
     change-log: ${LIQUIBASE_CHANGE_LOG:classpath:/db/changelog/db.changelog-master.xml}

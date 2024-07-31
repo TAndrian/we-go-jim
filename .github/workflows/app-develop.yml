@@ -1,11 +1,3 @@
-# This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-maven
-
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-
 # .github/workflows/java-ci.yml
 
 name: Java CI with Maven
@@ -33,22 +25,28 @@ jobs:
 
       - name: Set environment variables
         run: |
-          echo "MAIL_USERNAME=${{ vars.EMAIL_USERNAME }}" >> $GITHUB_ENV
-          echo "MAIL_PASSWORD=${{ vars.EMAIL_PASSWORD }}" >> $GITHUB_ENV
-          echo "JWT_SECRET_KEY=${{ vars.JWT_SECRET }}" >> $GITHUB_ENV
-          echo "DATASOURCE_URL=${{ vars.DB_URL }}" >> $GITHUB_ENV
-          echo "DATASOURCE_USERNAME=${{ vars.DB_USERNAME }}" >> $GITHUB_ENV
-          echo "DATASOURCE_PASSWORD=${{ vars.DB_PASSWORD }}" >> $GITHUB_ENV
-
-      - name: Replace placeholders in application.yml
-        run: |
-          sed -i 's/username:/${{ vars.MAIL_USERNAME }}/' src/main/resources/application.yml
-          sed -i 's/password:/${{ vars.MAIL_PASSWORD }}/' src/main/resources/application.yml
-          sed -i 's/secret-key:/${{ vars.JWT_SECRET_KEY }}/' src/main/resources/application.yml
-          sed -i 's/url:/${{ vars.DATASOURCE_URL }}/' src/main/resources/application.yml
-          sed -i 's/username:/${{ vars.DATASOURCE_USERNAME }}/' src/main/resources/application.yml
-          sed -i 's/password:/${{ vars.DATASOURCE_PASSWORD }}/' src/main/resources/application.yml
+          echo "REDIS_HOST=${{ vars.REDIS_HOST }}" >> $GITHUB_ENV
+          echo "REDIS_PORT=${{ vars.REDIS_PORT }}" >> $GITHUB_ENV
+          echo "REDIS_TIMEOUT=${{ vars.REDIS_TIMEOUT }}" >> $GITHUB_ENV
+          echo "MAIL_HOST=${{ vars.MAIL_HOST }}" >> $GITHUB_ENV
+          echo "MAIL_PORT=${{ vars.MAIL_PORT }}" >> $GITHUB_ENV
+          echo "MAIL_USERNAME=${{ vars.MAIL_USERNAME }}" >> $GITHUB_ENV
+          echo "MAIL_PASSWORD=${{ vars.MAIL_PASSWORD }}" >> $GITHUB_ENV
+          echo "MAIL_SMTP_AUTH=${{ vars.MAIL_SMTP_AUTH }}" >> $GITHUB_ENV
+          echo "MAIL_STARTTLS_ENABLE=${{ vars.MAIL_STARTTLS_ENABLE }}" >> $GITHUB_ENV
+          echo "JWT_SECRET_KEY=${{ vars.JWT_SECRET_KEY }}" >> $GITHUB_ENV
+          echo "JWT_EXPIRATION=${{ vars.JWT_EXPIRATION }}" >> $GITHUB_ENV
+          echo "JWT_REFRESH_TOKEN_EXPIRATION=${{ vars.JWT_REFRESH_TOKEN_EXPIRATION }}" >> $GITHUB_ENV
+          echo "DATASOURCE_URL=${{ vars.DATASOURCE_URL }}" >> $GITHUB_ENV
+          echo "DATASOURCE_USERNAME=${{ vars.DATASOURCE_USERNAME }}" >> $GITHUB_ENV
+          echo "DATASOURCE_PASSWORD=${{ vars.DATASOURCE_PASSWORD }}" >> $GITHUB_ENV
+          echo "DATASOURCE_DRIVER_CLASS_NAME=${{ vars.DATASOURCE_DRIVER_CLASS_NAME }}" >> $GITHUB_ENV
+          echo "JPA_HIBERNATE_DDL_AUTO=${{ vars.JPA_HIBERNATE_DDL_AUTO }}" >> $GITHUB_ENV
+          echo "JPA_SHOW_SQL=${{ vars.JPA_SHOW_SQL }}" >> $GITHUB_ENV
+          echo "JPA_HIBERNATE_FORMAT_SQL=${{ vars.JPA_HIBERNATE_FORMAT_SQL }}" >> $GITHUB_ENV
+          echo "JPA_HIBERNATE_DIALECT=${{ vars.JPA_HIBERNATE_DIALECT }}" >> $GITHUB_ENV
+          echo "LIQUIBASE_ENABLED=${{ vars.LIQUIBASE_ENABLED }}" >> $GITHUB_ENV
+          echo "LIQUIBASE_CHANGE_LOG=${{ vars.LIQUIBASE_CHANGE_LOG }}" >> $GITHUB_ENV
 
       - name: Build with Maven
         run: mvn -B package --file pom.xml
-
