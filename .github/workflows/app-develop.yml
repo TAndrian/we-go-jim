@@ -33,23 +33,15 @@ jobs:
 
       - name: Set environment variables
         run: |
-          echo "REDIS_HOST=${{ vars.REDIS_HOST }}" >> $GITHUB_ENV
-          echo "REDIS_PORT=${{ vars.REDIS_PORT }}" >> $GITHUB_ENV
-          echo "MAIL_HOST=${{ vars.MAIL_HOST }}" >> $GITHUB_ENV
-          echo "MAIL_PORT=${{ vars.MAIL_PORT }}" >> $GITHUB_ENV
-          echo "MAIL_USERNAME=${{ vars.MAIL_USERNAME }}" >> $GITHUB_ENV
-          echo "MAIL_PASSWORD=${{ vars.MAIL_PASSWORD }}" >> $GITHUB_ENV
-          echo "JWT_SECRET_KEY=${{ vars.JWT_SECRET_KEY }}" >> $GITHUB_ENV
-          echo "DATASOURCE_URL=${{ vars.DATASOURCE_URL }}" >> $GITHUB_ENV
-          echo "DATASOURCE_USERNAME=${{ vars.DATASOURCE_USERNAME }}" >> $GITHUB_ENV
-          echo "DATASOURCE_PASSWORD=${{ vars.DATASOURCE_PASSWORD }}" >> $GITHUB_ENV
+          echo "MAIL_USERNAME=${{ vars.EMAIL_USERNAME }}" >> $GITHUB_ENV
+          echo "MAIL_PASSWORD=${{ vars.EMAIL_PASSWORD }}" >> $GITHUB_ENV
+          echo "JWT_SECRET_KEY=${{ vars.JWT_SECRET }}" >> $GITHUB_ENV
+          echo "DATASOURCE_URL=${{ vars.DB_URL }}" >> $GITHUB_ENV
+          echo "DATASOURCE_USERNAME=${{ vars.DB_USERNAME }}" >> $GITHUB_ENV
+          echo "DATASOURCE_PASSWORD=${{ vars.DB_PASSWORD }}" >> $GITHUB_ENV
 
       - name: Replace placeholders in application.yml
         run: |
-          sed -i 's/localhost/${{ vars.REDIS_HOST }}/' src/main/resources/application.yml
-          sed -i 's/6379/${{ vars.REDIS_PORT }}/' src/main/resources/application.yml
-          sed -i 's/smtp.gmail.com/${{ vars.MAIL_HOST }}/' src/main/resources/application.yml
-          sed -i 's/587/${{ vars.MAIL_PORT }}/' src/main/resources/application.yml
           sed -i 's/username:/${{ vars.MAIL_USERNAME }}/' src/main/resources/application.yml
           sed -i 's/password:/${{ vars.MAIL_PASSWORD }}/' src/main/resources/application.yml
           sed -i 's/secret-key:/${{ vars.JWT_SECRET_KEY }}/' src/main/resources/application.yml
