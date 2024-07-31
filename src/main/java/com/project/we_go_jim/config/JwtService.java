@@ -19,10 +19,6 @@ public class JwtService {
 
     @Value("${spring.application.security.jwt.secret-key}")
     private String secretKey;
-    @Value("${spring.application.security.jwt.expiration}")
-    private long jwtExpiration;
-    @Value("${spring.application.security.jwt.refresh-token.expiration}")
-    private long refreshExpiration;
 
     /**
      * Extract username from the JWT token.
@@ -68,7 +64,8 @@ public class JwtService {
             Map<String, Object> extraClaims,
             UserDetails userDetails
     ) {
-        return buildToken(extraClaims, userDetails, jwtExpiration);
+        long JWT_EXPIRATION = 86400000;
+        return buildToken(extraClaims, userDetails, JWT_EXPIRATION);
     }
 
     /**
