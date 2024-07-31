@@ -1,6 +1,7 @@
 package com.project.we_go_jim.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.we_go_jim.config.JwtAuthenticationFilter;
 import com.project.we_go_jim.controller.resource.BookingResourceController;
 import com.project.we_go_jim.dto.BookingDTO;
 import com.project.we_go_jim.dto.CreateBookingDTO;
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -38,6 +40,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ExtendWith(MockitoExtension.class)
 @WebMvcTest(BookingResourceController.class)
+@AutoConfigureMockMvc(addFilters = false)
 class BookingResourceControllerUnitTest {
 
     public static final UUID MOCK_NOT_FOUND_USER_ID = UUID.randomUUID();
@@ -48,6 +51,9 @@ class BookingResourceControllerUnitTest {
     public static final CreateBookingDTO MOCK_CREATE_BOOKING_DTO = BookingMock.createBookingDTO();
     @MockBean
     private BookingService bookingService;
+
+    @MockBean
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Autowired
     private MockMvc mockMvc;

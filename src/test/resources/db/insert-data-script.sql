@@ -3,7 +3,8 @@ CREATE TABLE IF NOT EXISTS users(
     first_name VARCHAR(255) NOT NULL,
     last_name VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL
+    password VARCHAR(255) NOT NULL,
+    role VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS booking(
@@ -18,9 +19,9 @@ CREATE TABLE IF NOT EXISTS users_bookings(
     PRIMARY KEY(user_id, booking_id)
 );
 
-INSERT INTO users (id, first_name, last_name, email, password) VALUES
-  ('4fab73f9-b152-4bb6-a515-ed13cef63a0c', 'John', 'Doe', 'john.doe@example.com', 'password123'),
-  ('921fa993-b38f-41c0-99bb-5555515e73a0', 'Jane', 'Smith', 'jane.smith@example.com', 'password123');
+INSERT INTO users (id, first_name, last_name, email, password, role) VALUES
+  ('4fab73f9-b152-4bb6-a515-ed13cef63a0c', 'John', 'Doe', 'john.doe@example.com', 'password123', 'USER'),
+  ('921fa993-b38f-41c0-99bb-5555515e73a0', 'Jane', 'Smith', 'jane.smith@example.com', 'password123', 'USER');
 
 INSERT INTO booking (id, start_time, end_time, max_participant) VALUES
   ('f255538a-8a02-4c43-adf4-aa37cce43894', '2024-06-19T12:00:00', '2024-06-19T12:30:00', 10),

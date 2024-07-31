@@ -73,4 +73,6 @@
                                  onDelete="CASCADE"/>
     </changeSet>
 
+    <include file="classpath:db/changesets/wgj-changeset-0.0.1.xml" relativeToChangelogFile="false" author="TAndrian"/>
+
 </databaseChangeLog>

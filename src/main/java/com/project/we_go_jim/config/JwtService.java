@@ -64,7 +64,7 @@ public class JwtService {
      * @param userDetails user details.
      * @return JWT token.
      */
-    public String generateToken(
+    private String generateToken(
             Map<String, Object> extraClaims,
             UserDetails userDetails
     ) {
@@ -127,7 +127,7 @@ public class JwtService {
     private Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
     }
-    
+
     /**
      * Extract all claims from JWT token.
      *
