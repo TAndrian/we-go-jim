@@ -29,6 +29,9 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthenticationResponseDTO authenticate(AuthenticationRequestDTO authRequest) {
+
+        var userEntity = getUserByEmail(authRequest.getEmail());
+
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         authRequest.getEmail(),
@@ -36,22 +39,29 @@ public class AuthServiceImpl implements AuthService {
                 )
         );
 
-        var userEntity = userRepository.findByEmail(authRequest.getEmail()).orElseThrow(
+        String token = jwtService.generateToken(userEntity);
+
+        return AuthenticationResponseDTO.builder()
+                .accessToken(token)
+                .build();
+    }
+
+    /**
+     * Get user by email.
+     *
+     * @param email user's email.
+     * @return user.
+     */
+    private UserEntity getUserByEmail(String email) {
+        return userRepository.findByEmail(email).orElseThrow(
                 () -> {
-                    log.info("User not found with the user email: {}", authRequest.getEmail());
+                    log.info("User not found with the user email: {}", email);
                     return new NotFoundException(
                             UserExceptionEnum.USER_NOT_FOUND.value,
                             UserExceptionEnum.USER_EXCEPTION_CODE.value
                     );
                 }
         );
-
-        String token = jwtService.generateToken(userEntity);
-
-
-        return AuthenticationResponseDTO.builder()
-                .accessToken(token)
-                .build();
     }
 
     @Override

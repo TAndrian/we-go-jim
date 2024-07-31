@@ -7,8 +7,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: usermail
-    password: password
+    username:
+    password:
     properties:
       mail:
         smtp:
@@ -20,7 +20,7 @@ spring:
     name: we-go-jim
     security:
       jwt:
-        secret-key: 82bdf813fb5c74a4de994760c094c8fd607478b146364eb1dba733124b91cd8363c9ba36229621f84b3cb82826b773f662d1e81b3afa99f86e8d99bd742c025ff760b497b6622ac6e5d8ef2fb0a11f969a6eb08b908269046394170a7e7d7acbbf89ec48a6a37d845faf21a643dcf55d0effd1733fef73e6bb96dcdb360a1414f2f72dde487b09daebba51328cb523cf0c48421c3235050cb407ace32c2e9c6245c0e53dedab4ff13224a24d0bfad3d1b32fe8a387f0ede9fea93c51c1f4f475351b0d89dd3bf2e6414896f870b140c7b139379a5ffc592973c93e7ef8d59dff2f6eb7e7f70176a86e0dd432f9dba4a15f11e018a05245088b0b4e1c684e4377
+        secret-key:
         expiration: 86400000 # a day
         refresh-token:
           expiration: 604800000 # 7 days
@@ -34,8 +34,8 @@ spring:
 
   datasource:
     url: jdbc:postgresql://localhost:5433/gym
-    username: postgres
-    password: 123456
+    username:
+    password:
     driver-class-name: org.postgresql.Driver
 
   jpa:

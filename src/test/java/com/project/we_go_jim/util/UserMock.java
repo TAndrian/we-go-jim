@@ -3,6 +3,7 @@ package com.project.we_go_jim.util;
 import com.project.we_go_jim.dto.CreateUserDTO;
 import com.project.we_go_jim.dto.UserDTO;
 import com.project.we_go_jim.model.UserEntity;
+import com.project.we_go_jim.model.enums.Role;
 
 import java.util.HashSet;
 import java.util.UUID;
@@ -18,6 +19,8 @@ public class UserMock {
                 .lastName("Doe")
                 .email("john.doe@test.com")
                 .bookings(new HashSet<>())
+                .password("encodedPassword")
+                .role(Role.USER)
                 .build();
     }
 
