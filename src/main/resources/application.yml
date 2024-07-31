@@ -3,7 +3,6 @@ spring:
     host: ${REDIS_HOST:localhost}
     port: ${REDIS_PORT:6379}
     timeout: ${REDIS_TIMEOUT:2000}
-
   mail:
     host: ${MAIL_HOST:smtp.gmail.com}
     port: ${MAIL_PORT:587}
@@ -15,26 +14,22 @@ spring:
           auth: ${MAIL_SMTP_AUTH:true}
           starttls:
             enable: ${MAIL_STARTTLS_ENABLE:true}
-
   application:
     name: ${APP_NAME:we-go-jim}
     security:
       jwt:
         secret-key: ${JWT_SECRET_KEY}
-
   log4j:
     logger:
       org:
         hibernate:
           type: ${LOG4J_HIBERNATE_TYPE:TRACE}
           SQL: ${LOG4J_SQL:DEBUG}
-
   datasource:
     url: ${DATASOURCE_URL}
     username: ${DATASOURCE_USERNAME}
     password: ${DATASOURCE_PASSWORD}
-      driver-class-name: ${DATASOURCE_DRIVER_CLASS_NAME:org.postgresql.Driver}
-
+    driver-class-name: ${DATASOURCE_DRIVER_CLASS_NAME:org.postgresql.Driver}
   jpa:
     hibernate:
       ddl-auto: ${JPA_HIBERNATE_DDL_AUTO:update}
@@ -43,10 +38,6 @@ spring:
       hibernate:
         format_sql: ${JPA_HIBERNATE_FORMAT_SQL:true}
         dialect: ${JPA_HIBERNATE_DIALECT:org.hibernate.dialect.PostgreSQLDialect}
-
   liquibase:
     enabled: ${LIQUIBASE_ENABLED:true}
     change-log: ${LIQUIBASE_CHANGE_LOG:classpath:/db/changelog/db.changelog-master.xml}
-
-
-
