@@ -427,6 +427,78 @@
 			"name": "Auth",
 			"item": [
 				{
+					"name": "Email verification",
+					"item": [
+						{
+							"name": "sendCode",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/v1/verify/send-code?toEmail=LenOkimaru@gmail.com",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"verify",
+										"send-code"
+									],
+									"query": [
+										{
+											"key": "toEmail",
+											"value": "LenOkimaru@gmail.com"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "verifyCode",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/v1/verify/verify-code?toEmail=LenOkimaru@gmail.com&code=490463",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"verify",
+										"verify-code"
+									],
+									"query": [
+										{
+											"key": "toEmail",
+											"value": "LenOkimaru@gmail.com"
+										},
+										{
+											"key": "code",
+											"value": "490463"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
 					"name": "authenticate",
 					"event": [
 						{
@@ -527,73 +599,6 @@
 								"v1",
 								"auth",
 								"register"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "sendCode",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "application/json",
-								"type": "text"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/verify/send-code?toEmail=LenOkimaru@gmail.com",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"verify",
-								"send-code"
-							],
-							"query": [
-								{
-									"key": "toEmail",
-									"value": "LenOkimaru@gmail.com"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "verifyCode",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/verify/verify-code?toEmail=LenOkimaru@gmail.com&code=490463",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"verify",
-								"verify-code"
-							],
-							"query": [
-								{
-									"key": "toEmail",
-									"value": "LenOkimaru@gmail.com"
-								},
-								{
-									"key": "code",
-									"value": "490463"
-								}
 							]
 						}
 					},
