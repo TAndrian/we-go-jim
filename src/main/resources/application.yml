@@ -7,8 +7,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username:
-    password:
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
     properties:
       mail:
         smtp:
@@ -20,7 +20,7 @@ spring:
     name: we-go-jim
     security:
       jwt:
-        secret-key:
+        secret-key: ${JWT_SECRET_KEY}
         expiration: 86400000 # a day
         refresh-token:
           expiration: 604800000 # 7 days
@@ -33,9 +33,9 @@ spring:
           SQL: DEBUG
 
   datasource:
-    url: jdbc:postgresql://localhost:5433/gym
-    username:
-    password:
+    url: ${DATASOURCE_URL}
+    username: ${DATASOURCE_USERNAME}
+    password: ${DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
   jpa:
