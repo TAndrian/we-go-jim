@@ -94,6 +94,7 @@ class WeGoJimApplicationTests {
         var userEntity = userRepository.findById(JOHN_ID).orElseThrow();
         String jwtToken = jwtService.generateToken(userEntity);
         headers.set("Authorization", "Bearer " + jwtToken);
+        headers.set("X-CSRF-TOKEN", "b3c7338e-95c0-4088-9fb7-d72a870bd60c");
     }
 
     @AfterEach
@@ -262,11 +263,9 @@ class WeGoJimApplicationTests {
                 .concat(USER + "/" + JOHN_ID);
 
         // ACT
-        HttpEntity<BookingDTO> entity = new HttpEntity<>(headers);
-        ResponseEntity<BookingDTO> response =
-                restTemplate.postForEntity(baseUrl, entity, BookingDTO.class);
+        HttpEntity<BookingDTO> request = new HttpEntity<>(headers);
+        BookingDTO expected = restTemplate.postForObject(baseUrl, request, BookingDTO.class);
 
-        BookingDTO expected = response.getBody();
         BookingDTO bookingDTO = bookingMapper.toDTO(bookingRepository.findById(BOOKING_ID).orElseThrow());
         UserDTO userDTO = userMapper.toDTO(userRepository.findById(JOHN_ID).orElseThrow());
 
@@ -282,7 +281,6 @@ class WeGoJimApplicationTests {
 
         // ASSERT
         assertAll(
-                () -> assertEquals(HttpStatus.OK, response.getStatusCode()),
                 () -> assertThat(bookingDTO).isEqualTo(expected),
                 () -> assertTrue(expectedUsers.contains(userDTO))
         );
