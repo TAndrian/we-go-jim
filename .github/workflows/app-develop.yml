@@ -19,50 +19,17 @@ jobs:
           java-version: "17"
           distribution: temurin
           cache: maven
-
       - name: Create dotenv file
+        run: touch .env
+      - name: Initialize environment variables
         run: |
-          touch .env
-          echo "JWT_SECRET_KEY=${{ vars.JWT_SECRET_KEY }}"
+          echo "REDIS_HOST=${{ vars.REDIS_HOST }}" > .env
+          echo "REDIS_PORT=${{ vars.REDIS_PORT }}" > .env
+          echo "JWT_SECRET_KEY=${{ vars.JWT_SECRET_KEY }}" > .env
+          echo "MAIL_HOST=${{ vars.MAIL_HOST }}" >> .env
+          echo "MAIL_PORT=${{ vars.MAIL_PORT }}" >> .env
+          echo "MAIL_USERNAME=${{ vars.MAIL_USERNAME }}" >> .env
+          echo "MAIL_PASSWORD=${{ vars.MAIL_PASSWORD }}" >> .env
           cat .env
-
-      - name: Set environment variables
-        run: >
-          echo "REDIS_HOST=${{ vars.REDIS_HOST }}" >> $GITHUB_ENV
-
-          echo "REDIS_PORT=${{ vars.REDIS_PORT }}" >> $GITHUB_ENV
-
-          echo "MAIL_HOST=${{ vars.MAIL_HOST }}" >> $GITHUB_ENV
-
-          echo "MAIL_PORT=${{ vars.MAIL_PORT }}" >> $GITHUB_ENV
-
-          echo "MAIL_USERNAME=${{ vars.MAIL_USERNAME }}" >> $GITHUB_ENV
-
-          echo "MAIL_PASSWORD=${{ vars.MAIL_PASSWORD }}" >> $GITHUB_ENV
-
-          echo "DATASOURCE_URL=${{ vars.DATASOURCE_URL }}" >> $GITHUB_ENV
-
-          echo "DATASOURCE_USERNAME=${{ vars.DATASOURCE_USERNAME }}" >> $GITHUB_ENV
-
-          echo "DATASOURCE_PASSWORD=${{ vars.DATASOURCE_PASSWORD }}" >> $GITHUB_ENV
-      - name: Replace placeholders in application.yml
-        run: >
-          sed -i '/redis_host/${{ vars.REDIS_HOST }}/' src/main/resources/application.yml
-
-          sed -i 's/redis_port/${{ vars.REDIS_PORT }}/' src/main/resources/application.yml
-
-          sed -i 's/mail_host/${{ vars.MAIL_HOST }}/' src/main/resources/application.yml
-
-          sed -i 's/mail_port/${{ vars.MAIL_PORT }}/' src/main/resources/application.yml
-
-          sed -i 's/mail_username:/${{ vars.MAIL_USERNAME }}/' src/main/resources/application.yml
-
-          sed -i 's/mail_password:/${{ vars.MAIL_PASSWORD }}/' src/main/resources/application.yml
-
-          sed -i 's/datasource_url:/${{ vars.DATASOURCE_URL }}/' src/main/resources/application.yml
-
-          sed -i 's/datasource_username:/${{ vars.DATASOURCE_USERNAME }}/' src/main/resources/application.yml
-
-          sed -i 's/datasource_password:/${{ vars.DATASOURCE_PASSWORD }}/' src/main/resources/application.yml
       - name: Build with Maven
         run: mvn -B package --file pom.xml
