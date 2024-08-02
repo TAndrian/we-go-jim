@@ -1,31 +1,35 @@
-# This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-maven
-
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-
+---
 name: Java CI with Maven
-
 on:
   push:
-    branches: [ "develop" ]
+    branches:
+      - develop
   pull_request:
-    branches: [ "develop" ]
-
+    branches:
+      - develop
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up JDK 17
-      uses: actions/setup-java@v3
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-        cache: maven
-    - name: Build with Maven
-      run: mvn -B package --file pom.xml
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: "17"
+          distribution: temurin
+          cache: maven
+      - name: Create dotenv file
+        run: touch .env
+      - name: Initialize environment variables
+        run: |
+          echo "REDIS_HOST=${{ vars.REDIS_HOST }}" > .env
+          echo "REDIS_PORT=${{ vars.REDIS_PORT }}" >> .env
+          echo "JWT_SECRET_KEY=${{ vars.JWT_SECRET_KEY }}" >> .env
+          echo "MAIL_HOST=${{ vars.MAIL_HOST }}" >> .env
+          echo "MAIL_PORT=${{ vars.MAIL_PORT }}" >> .env
+          echo "MAIL_USERNAME=${{ vars.MAIL_USERNAME }}" >> .env
+          echo "MAIL_PASSWORD=${{ vars.MAIL_PASSWORD }}" >> .env
+          cat .env
+      - name: Build with Maven
+        run: mvn -B package --file pom.xml

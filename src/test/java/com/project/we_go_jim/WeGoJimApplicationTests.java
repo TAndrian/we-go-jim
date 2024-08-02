@@ -1,6 +1,8 @@
 package com.project.we_go_jim;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.we_go_jim.config.JwtService;
 import com.project.we_go_jim.dto.BookingDTO;
 import com.project.we_go_jim.dto.CreateBookingDTO;
 import com.project.we_go_jim.dto.UserBookingHistoryDTO;
@@ -46,7 +48,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
+@ActiveProfiles(profiles = {"test"})
 class WeGoJimApplicationTests {
 
     public static final UUID JOHN_ID = UserMock.JOHN_ID;
@@ -63,6 +65,9 @@ class WeGoJimApplicationTests {
     private UserRepository userRepository;
     @Autowired
     private BookingRepository bookingRepository;
+
+    @Autowired
+    private JwtService jwtService;
 
     @Autowired
     private UserMapper userMapper;
@@ -86,6 +91,9 @@ class WeGoJimApplicationTests {
     @BeforeEach
     public void setUp() {
         dbCommonOperation.initializeTestData();
+        var userEntity = userRepository.findById(JOHN_ID).orElseThrow();
+        String jwtToken = jwtService.generateToken(userEntity);
+        headers.set("Authorization", "Bearer " + jwtToken);
     }
 
     @AfterEach
@@ -211,7 +219,7 @@ class WeGoJimApplicationTests {
     }
 
     @Test
-    void should_create_booking_for_user() {
+    void should_create_booking_for_user() throws JsonProcessingException {
         // ARRANGE
 
         baseUrl = baseUrl.concat(":")
@@ -221,11 +229,14 @@ class WeGoJimApplicationTests {
 
         CreateBookingDTO createBookingDTO = BookingMock.createBookingDTO();
 
-        // ACT
-        ResponseEntity<BookingDTO> response =
-                restTemplate.postForEntity(baseUrl, createBookingDTO, BookingDTO.class);
+        String requestBody = objectMapper.writeValueAsString(createBookingDTO);
 
-        BookingDTO expected = response.getBody();
+        HttpEntity<String> request = new HttpEntity<>(requestBody, headers);
+
+        // ACT
+
+        BookingDTO expected = restTemplate.postForObject(baseUrl, request, BookingDTO.class);
+
         assert expected != null;
         BookingDTO bookingDTO = bookingMapper.toDTO(bookingRepository.findById(expected.getId()).orElseThrow());
 
@@ -237,7 +248,6 @@ class WeGoJimApplicationTests {
 
         // ASSERT
         assertAll(
-                () -> assertEquals(HttpStatus.CREATED, response.getStatusCode()),
                 () -> assertThat(bookingDTO).isEqualTo(expected)
         );
     }

@@ -1,21 +1,27 @@
 spring:
+  redis:
+    timeout: 2000
   application:
     name: we-go-jim
-
+  log4j:
+    logger:
+      org:
+        hibernate:
+          type: TRACE
+          SQL: DEBUG
   datasource:
-    url: jdbc:postgresql://localhost:5432/gym
-    username: postgres
-    password: 123456
+    url: ${datasource_url}
+    username: ${datasource_username}
+    password: ${datasource_password}
     driver-class-name: org.postgresql.Driver
-
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
     properties:
       hibernate:
+        format_sql: "true"
         dialect: org.hibernate.dialect.PostgreSQLDialect
   liquibase:
     enabled: true
     change-log: classpath:/db/changelog/db.changelog-master.xml
-

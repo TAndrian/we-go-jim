@@ -1,26 +1,17 @@
 package com.project.we_go_jim.model;
 
+import com.project.we_go_jim.model.enums.Role;
 import com.project.we_go_jim.util.TemporalBaseUtil;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.*;
 
 @Entity
 @Builder
@@ -32,7 +23,10 @@ import java.util.UUID;
 )
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserEntity extends TemporalBaseUtil {
+public class UserEntity extends TemporalBaseUtil implements UserDetails, Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 2405172041950251807L;
 
     @Id
     @GeneratedValue(generator = "uuid-hibernate-generator")
@@ -47,6 +41,9 @@ public class UserEntity extends TemporalBaseUtil {
     @Column(unique = true)
     private String email;
     private String password;
+
+    @Enumerated(EnumType.STRING)
+    private Role role;
     @ManyToMany(
             cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}
     )
@@ -56,4 +53,19 @@ public class UserEntity extends TemporalBaseUtil {
             inverseJoinColumns = @JoinColumn(name = "booking_id", referencedColumnName = "id")
     )
     private Set<BookingEntity> bookings = new HashSet<>();
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return new ArrayList<>(Collections.singleton(new SimpleGrantedAuthority(role.name())));
+    }
+
+    @Override
+    public String getPassword() {
+        return password;
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
+    }
 }

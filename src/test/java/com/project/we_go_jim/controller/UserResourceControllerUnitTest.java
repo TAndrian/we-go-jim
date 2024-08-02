@@ -1,6 +1,7 @@
 package com.project.we_go_jim.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.we_go_jim.config.JwtAuthenticationFilter;
 import com.project.we_go_jim.controller.resource.UserResourceController;
 import com.project.we_go_jim.dto.CreateUserDTO;
 import com.project.we_go_jim.dto.UserDTO;
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -34,10 +36,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ExtendWith(MockitoExtension.class)
 @WebMvcTest(UserResourceController.class)
+@AutoConfigureMockMvc(addFilters = false)
 class UserResourceControllerUnitTest {
 
     @MockBean
     private UserService userService;
+
+    @MockBean
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Autowired
     private MockMvc mockMvc;
