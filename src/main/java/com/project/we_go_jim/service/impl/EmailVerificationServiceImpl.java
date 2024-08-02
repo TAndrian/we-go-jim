@@ -7,7 +7,7 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
-import java.util.Random;
+import java.security.SecureRandom;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -16,7 +16,7 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
     private static final long CODE_EXPIRATION_MINUTES = 10;
     private static final String VERIFICATION_CODE = "verification_code:";
 
-    private static final Random random = new Random();
+    private static final SecureRandom random = new SecureRandom();
 
     private final RedisTemplate<String, String> redisTemplate;
 
