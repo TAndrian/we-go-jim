@@ -24,8 +24,8 @@ jobs:
       - name: Initialize environment variables
         run: |
           echo "REDIS_HOST=${{ vars.REDIS_HOST }}" > .env
-          echo "REDIS_PORT=${{ vars.REDIS_PORT }}" > .env
-          echo "JWT_SECRET_KEY=${{ vars.JWT_SECRET_KEY }}" > .env
+          echo "REDIS_PORT=${{ vars.REDIS_PORT }}" >> .env
+          echo "JWT_SECRET_KEY=${{ vars.JWT_SECRET_KEY }}" >> .env
           echo "MAIL_HOST=${{ vars.MAIL_HOST }}" >> .env
           echo "MAIL_PORT=${{ vars.MAIL_PORT }}" >> .env
           echo "MAIL_USERNAME=${{ vars.MAIL_USERNAME }}" >> .env
