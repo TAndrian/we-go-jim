@@ -47,7 +47,7 @@ jobs:
           echo "DATASOURCE_PASSWORD=${{ vars.DATASOURCE_PASSWORD }}" >> $GITHUB_ENV
       - name: Replace placeholders in application.yml
         run: >
-          sed -i 's/redis_host/${{ vars.REDIS_HOST }}/' src/main/resources/application.yml
+          sed -i '/redis_host/${{ vars.REDIS_HOST }}/' src/main/resources/application.yml
 
           sed -i 's/redis_port/${{ vars.REDIS_PORT }}/' src/main/resources/application.yml
 
