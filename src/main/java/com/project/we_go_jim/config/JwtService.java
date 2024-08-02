@@ -1,10 +1,10 @@
 package com.project.we_go_jim.config;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -17,8 +17,8 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
-    @Value("${spring.application.security.jwt.secret-key}")
-    private String secretKey;
+    Dotenv dotenv = Dotenv.load();
+    private final String JWT_SECRET_KEY = dotenv.get("JWT_SECRET_KEY");
 
     /**
      * Extract username from the JWT token.
@@ -145,7 +145,7 @@ public class JwtService {
      * @return Secret key.
      */
     private SecretKey getSignInKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+        byte[] keyBytes = Decoders.BASE64.decode(JWT_SECRET_KEY);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 }

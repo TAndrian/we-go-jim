@@ -1,13 +1,32 @@
+---
 spring:
-
+  redis:
+    host: ${redis_host}
+    port: ${redis_port}
+    timeout: 2000
+  mail:
+    host: smtp.gmail.cpm
+    port: 587
+    username: test@test.com
+    password: 123456
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
   application:
     name: we-go-jim
-
+  log4j:
+    logger:
+      org:
+        hibernate:
+          type: TRACE
+          SQL: DEBUG
   datasource:
     initialization-mode: always
-    data: 'classpath:insert-data-script.sql'
+    data: classpath:insert-data-script.sql
     driver-class-name: org.h2.Driver
-    url: 'jdbc:h2:mem:gym-test'
-
+    url: jdbc:h2:mem:gym-test
   liquibase:
     change-log: classpath:/db/test-changelog.xml
