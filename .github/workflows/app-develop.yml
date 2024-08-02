@@ -24,7 +24,7 @@ jobs:
         run: |
           touch .env
           echo "JWT_SECRET_KEY=${{ vars.JWT_SECRET_KEY }}"
-          cat .evn
+          cat .env
 
       - name: Set environment variables
         run: >
