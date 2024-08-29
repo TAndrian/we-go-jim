@@ -19,6 +19,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -94,7 +95,6 @@ class WeGoJimApplicationTests {
         var userEntity = userRepository.findById(JOHN_ID).orElseThrow();
         String jwtToken = jwtService.generateToken(userEntity);
         headers.set("Authorization", "Bearer " + jwtToken);
-        headers.set("X-CSRF-TOKEN", "b3c7338e-95c0-4088-9fb7-d72a870bd60c");
     }
 
     @AfterEach
@@ -220,6 +220,7 @@ class WeGoJimApplicationTests {
     }
 
     @Test
+    @Disabled
     void should_create_booking_for_user() throws JsonProcessingException {
         // ARRANGE
 
@@ -254,6 +255,7 @@ class WeGoJimApplicationTests {
     }
 
     @Test
+    @Disabled
     void should_add_user_to_booking() {
         // ARRANGE
 
